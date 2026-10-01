@@ -1,0 +1,2258 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Home Offer Calculator | Tracie Robinson, REALTOR®</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        brand: {
+                            50: '#f0f4f8',
+                            100: '#d9e2ec',
+                            500: '#1b365d', // Benchmark navy inspiration
+                            600: '#0f2545',
+                            700: '#0a192f',
+                            accent: '#c5a059', // Elegant gold accent
+                            accentHover: '#b38e46'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white !important; font-size: 12pt; }
+            .print-card { border: 1px solid #cbd5e1 !important; shadow: none !important; }
+        }
+        .print-only { display: none; }
+        .glass-header { background: rgba(255, 255, 255, 0.92); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="h-full text-slate-800 antialiased flex flex-col bg-slate-50 selection:bg-brand-500 selection:text-white">
+
+    <!-- TOP PERSISTENT NAVBAR -->
+    <header class="no-print sticky top-0 z-40 glass-header border-b border-slate-200/80 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <button id="backBtn" onclick="app.goBack()" class="p-2 -ml-2 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 hidden transition" aria-label="Go Back">
+                    <i class="fa-solid fa-arrow-left text-lg"></i>
+                </button>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="bg-brand-500 text-white font-bold text-xs px-2 py-0.5 rounded tracking-wide uppercase">Benchmark</span>
+                        <h1 class="font-bold text-slate-900 text-base sm:text-lg tracking-tight flex items-center gap-1.5">
+                            Home Offer Calculator
+                        </h1>
+                    </div>
+                    <p id="screenSubtitle" class="text-xs text-slate-500 font-medium truncate max-w-[200px] sm:max-w-xs">Screen 03: Dashboard</p>
+                </div>
+            </div>
+
+            <!-- Header Quick Controls -->
+            <div class="flex items-center gap-2">
+                <!-- Screen Selector Dropdown for Easy Reviewing -->
+                <div class="relative inline-block text-left">
+                    <select id="screenJumpSelect" onchange="app.navigateTo(this.value)" class="bg-slate-100 border border-slate-300 text-slate-700 text-xs rounded-lg focus:ring-brand-500 focus:border-brand-500 p-1.5 pr-6 font-medium cursor-pointer">
+                        <option value="s1">01. Splash Screen</option>
+                        <option value="s2">02. Onboarding</option>
+                        <option value="s3" selected>03. Dashboard</option>
+                        <option value="s4">04. Property/Buyer Form</option>
+                        <option value="s5">05. Loan Options Form</option>
+                        <option value="s6">06. Seller & Closing</option>
+                        <option value="s7">07. Rate Buydown Input</option>
+                        <option value="s8">08. Results Dashboard</option>
+                        <option value="s9">09. Max Purchase Price</option>
+                        <option value="s10">10. Multi-Offer Comparison</option>
+                        <option value="s11">11. Concession Limits</option>
+                        <option value="s12">12. Buydown Comparison</option>
+                        <option value="s13">13. Cash to Close Stack</option>
+                        <option value="s14">14. Offer Strategy</option>
+                        <option value="s15">15. Offer Summary Report</option>
+                        <option value="s16">16. Saved Scenarios</option>
+                        <option value="s17">17. Scenario Detail</option>
+                        <option value="s18">18. REALTOR® Profile</option>
+                        <option value="s19">19. App Settings</option>
+                        <option value="s20">20. Help / Definitions</option>
+                    </select>
+                </div>
+
+                <button onclick="app.navigateTo('s20')" class="p-2 rounded-lg text-slate-500 hover:text-brand-500 hover:bg-slate-100 transition" title="Definitions & Help">
+                    <i class="fa-regular fa-circle-question text-lg"></i>
+                </button>
+                <button onclick="app.navigateTo('s19')" class="p-2 rounded-lg text-slate-500 hover:text-brand-500 hover:bg-slate-100 transition" title="Settings">
+                    <i class="fa-solid fa-sliders text-lg"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- DUAL PRIMARY METRICS STICKY BANNER (Shown when active scenario is loaded) -->
+    <div id="persistentDualHero" class="no-print bg-brand-700 text-white shadow-inner border-b border-brand-600 px-4 py-2.5 transition-all duration-300">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3 text-xs sm:text-sm">
+            <div class="flex items-center gap-6">
+                <div>
+                    <span class="text-slate-300 text-[10px] uppercase tracking-wider block font-semibold">Estimated Monthly Payment</span>
+                    <span id="heroPaymentDisplay" class="font-bold text-lg sm:text-xl text-emerald-400">$2,418 <span class="text-xs font-normal text-slate-300">/mo</span></span>
+                </div>
+                <div class="h-8 w-px bg-slate-600"></div>
+                <div>
+                    <span class="text-slate-300 text-[10px] uppercase tracking-wider block font-semibold">Estimated Cash To Close</span>
+                    <span id="heroCashDisplay" class="font-bold text-lg sm:text-xl text-amber-300">$24,850</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span id="heroPropertyTag" class="hidden sm:inline-block bg-brand-600/80 border border-slate-500/50 rounded px-2 py-1 text-xs text-slate-200">123 Music Row, Nashville</span>
+                <button onclick="app.navigateTo('s8')" class="bg-brand-accent hover:bg-brand-accentHover text-slate-950 font-semibold px-3 py-1 rounded text-xs transition flex items-center gap-1 shadow-sm">
+                    <span>Full Analysis</span>
+                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP SCREEN CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 sm:pb-12">
+
+        <!-- SCREEN 01: SPLASH SCREEN -->
+        <section id="s1" class="app-screen hidden min-h-[75vh] flex flex-col items-center justify-center text-center px-4">
+            <div class="bg-white p-8 sm:p-12 rounded-3xl shadow-xl border border-slate-200/80 max-w-md w-full relative overflow-hidden">
+                <div class="absolute -top-12 -right-12 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl"></div>
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-brand-50 text-brand-500 rounded-2xl mb-6 shadow-sm border border-brand-100">
+                    <i class="fa-solid fa-calculator text-3xl text-brand-500"></i>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mb-2">Home Offer Calculator</h2>
+                <p class="text-slate-600 text-sm mb-6 leading-relaxed">Plan smarter. Compare offers. Understand your numbers with complete clarity.</p>
+                
+                <div class="bg-slate-50 rounded-xl p-3 border border-slate-200 mb-8 flex items-center justify-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-brand-500 text-white flex items-center justify-center font-bold text-xs">TR</div>
+                    <div class="text-left text-xs">
+                        <p class="font-bold text-slate-900">Tracie Robinson</p>
+                        <p class="text-slate-500">REALTOR® / Affiliate Broker | Benchmark Realty</p>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <button onclick="app.navigateTo('s2')" class="w-full bg-brand-500 hover:bg-brand-600 text-white font-semibold py-3.5 px-6 rounded-xl transition shadow-lg shadow-brand-500/25 flex items-center justify-center gap-2">
+                        <span>Launch App</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <button onclick="app.navigateTo('s3')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 px-6 rounded-xl transition text-xs">
+                        Skip directly to Dashboard
+                    </button>
+                </div>
+                
+                <p class="text-[11px] text-slate-400 mt-6">Nashville & Middle Tennessee Real Estate</p>
+            </div>
+        </section>
+
+        <!-- SCREEN 02: OPTIONAL ONBOARDING -->
+        <section id="s2" class="app-screen hidden max-w-lg mx-auto py-6">
+            <div class="bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col min-h-[520px]">
+                <div class="p-6 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                    <span class="text-xs font-bold uppercase tracking-wider text-brand-500">Welcome Guide</span>
+                    <button onclick="app.navigateTo('s3')" class="text-xs text-slate-500 hover:text-slate-900 font-medium">Skip onboarding</button>
+                </div>
+
+                <div class="p-8 flex-1 flex flex-col justify-center items-center text-center">
+                    <!-- Slide 1 -->
+                    <div id="onboardSlide1" class="onboard-slide transition-all">
+                        <div class="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-6 text-3xl">
+                            <i class="fa-solid fa-house-circle-check"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Know Your Monthly Payment</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed max-w-xs mx-auto">
+                            Understand total housing outlay including Principal, Interest, Property Taxes, Insurance, HOA fees, and PMI/MIP.
+                        </p>
+                    </div>
+
+                    <!-- Slide 2 -->
+                    <div id="onboardSlide2" class="onboard-slide hidden transition-all">
+                        <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-6 text-3xl">
+                            <i class="fa-solid fa-code-compare"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Compare Multiple Offers</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed max-w-xs mx-auto">
+                            Evaluate up to 4 purchase options side-by-side. Analyze how price, rate buydowns, and concessions impact your bottom line.
+                        </p>
+                    </div>
+
+                    <!-- Slide 3 -->
+                    <div id="onboardSlide3" class="onboard-slide hidden transition-all">
+                        <div class="w-20 h-20 bg-amber-50 text-amber-600 rounded-3xl flex items-center justify-center mx-auto mb-6 text-3xl">
+                            <i class="fa-solid fa-sack-dollar"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">Know Your Cash To Close</h3>
+                        <p class="text-slate-600 text-sm leading-relaxed max-w-xs mx-auto">
+                            Accurately estimate required down payment, prepaids, title fees, minus earnest money and seller credits.
+                        </p>
+                    </div>
+
+                    <!-- Pagination Dots -->
+                    <div class="flex items-center gap-2 mt-8">
+                        <button onclick="app.setSlide(1)" id="dot1" class="w-8 h-2 rounded-full bg-brand-500 transition-all"></button>
+                        <button onclick="app.setSlide(2)" id="dot2" class="w-2 h-2 rounded-full bg-slate-300 transition-all"></button>
+                        <button onclick="app.setSlide(3)" id="dot3" class="w-2 h-2 rounded-full bg-slate-300 transition-all"></button>
+                    </div>
+                </div>
+
+                <div class="p-6 bg-slate-50 border-t border-slate-200 flex justify-between gap-3">
+                    <button id="onboardPrev" onclick="app.prevSlide()" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-600 font-semibold text-xs hover:bg-slate-100 transition opacity-50 cursor-not-allowed" disabled>Back</button>
+                    <button id="onboardNext" onclick="app.nextSlide()" class="px-6 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-semibold text-xs shadow transition flex items-center gap-2">
+                        <span>Next</span>
+                        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 03: HOME / DASHBOARD -->
+        <section id="s3" class="app-screen space-y-6">
+            <!-- Agent Welcome Banner -->
+            <div class="bg-gradient-to-r from-brand-700 via-brand-600 to-slate-900 rounded-2xl p-6 text-white shadow-lg relative overflow-hidden">
+                <div class="absolute right-0 top-0 bottom-0 w-1/3 opacity-10 bg-repeat bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+                <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/10 text-brand-accent text-xs font-semibold mb-2 backdrop-blur-sm border border-white/10">
+                            <i class="fa-solid fa-award"></i>
+                            <span>Nashville Metropolitan Area Expert</span>
+                        </div>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Tracie Robinson Advisor Suite</h2>
+                        <p class="text-slate-300 text-xs sm:text-sm mt-1 max-w-xl">
+                            Evaluate offer scenarios, compute maximum purchasing power, and generate client-ready reports for Benchmark Realty buyers.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="app.startNewCalculation()" class="bg-brand-accent hover:bg-brand-accentHover text-slate-950 font-bold px-5 py-3 rounded-xl shadow-md transition flex items-center gap-2 text-sm whitespace-nowrap">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>New Calculation</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Action Cards Grid -->
+            <div>
+                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-bolt text-amber-500"></i> Core Calculators & Analysis
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div onclick="app.startNewCalculation()" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-brand-500/50 cursor-pointer transition group">
+                        <div class="w-12 h-12 bg-blue-50 text-brand-500 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-calculator text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 group-hover:text-brand-500 transition">New Calculation</h4>
+                        <p class="text-slate-500 text-xs mt-1">Start step-by-step analysis for a target property.</p>
+                    </div>
+
+                    <div onclick="app.navigateTo('s10')" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-brand-500/50 cursor-pointer transition group">
+                        <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-code-compare text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 group-hover:text-brand-500 transition">Compare Offers</h4>
+                        <p class="text-slate-500 text-xs mt-1">Side-by-side matrix for up to 4 purchase offers.</p>
+                    </div>
+
+                    <div onclick="app.navigateTo('s12')" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-brand-500/50 cursor-pointer transition group">
+                        <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-chart-line text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 group-hover:text-brand-500 transition">Rate Buydown</h4>
+                        <p class="text-slate-500 text-xs mt-1">Calculate 1-point, 2-point & 3-2-1 break-even savings.</p>
+                    </div>
+
+                    <div onclick="app.navigateTo('s13')" class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-brand-500/50 cursor-pointer transition group">
+                        <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid fa-coins text-xl"></i>
+                        </div>
+                        <h4 class="font-bold text-slate-900 group-hover:text-brand-500 transition">Cash To Close</h4>
+                        <p class="text-slate-500 text-xs mt-1">Detailed breakdown of funds required at settlement.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Secondary Tools Row -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div onclick="app.navigateTo('s9')" class="bg-white p-4 rounded-xl border border-slate-200 hover:border-slate-300 flex items-center gap-4 cursor-pointer transition">
+                    <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-sliders"></i>
+                    </div>
+                    <div>
+                        <h5 class="font-bold text-sm text-slate-900">Reverse Max Price Calculator</h5>
+                        <p class="text-xs text-slate-500">Calculate budget based on target monthly payment.</p>
+                    </div>
+                </div>
+
+                <div onclick="app.navigateTo('s14')" class="bg-white p-4 rounded-xl border border-slate-200 hover:border-slate-300 flex items-center gap-4 cursor-pointer transition">
+                    <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-chess-knight"></i>
+                    </div>
+                    <div>
+                        <h5 class="font-bold text-sm text-slate-900">Offer Strategy Generator</h5>
+                        <p class="text-xs text-slate-500">Factual scenario matrix for asking price vs comps.</p>
+                    </div>
+                </div>
+
+                <div onclick="app.navigateTo('s15')" class="bg-white p-4 rounded-xl border border-slate-200 hover:border-slate-300 flex items-center gap-4 cursor-pointer transition">
+                    <div class="w-10 h-10 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center font-bold">
+                        <i class="fa-solid fa-file-pdf text-red-500"></i>
+                    </div>
+                    <div>
+                        <h5 class="font-bold text-sm text-slate-900">Client Summary PDF Report</h5>
+                        <p class="text-xs text-slate-500">Generate branded presentation for buyers.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Saved Scenarios Section -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base">Saved Property Scenarios</h3>
+                        <p class="text-xs text-slate-500">Manage buyer consultations and active offers</p>
+                    </div>
+                    <button onclick="app.navigateTo('s16')" class="text-xs font-semibold text-brand-500 hover:underline flex items-center gap-1">
+                        View All Saved (<span id="savedCount">2</span>)
+                        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                    </button>
+                </div>
+
+                <div id="homeRecentScenariosGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Dynamic rendering inserted via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 04: PROPERTY & BUYER INPUT FORM (STEP 1 & 2) -->
+        <section id="s4" class="app-screen hidden max-w-3xl mx-auto space-y-6">
+            <!-- Progress Tracker Bar -->
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="flex items-center justify-between text-xs font-medium text-slate-500 mb-2">
+                    <span class="text-brand-500 font-bold">Step 1 of 5: Property & Buyer</span>
+                    <span>20% Complete</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div class="bg-brand-500 h-full w-[20%] transition-all"></div>
+                </div>
+                <div class="flex justify-between text-[10px] text-slate-400 mt-2 font-medium">
+                    <span class="text-brand-500 font-bold">Property/Buyer</span>
+                    <span>Loan</span>
+                    <span>Seller/Closing</span>
+                    <span>Buydown</span>
+                    <span>Results</span>
+                </div>
+            </div>
+
+            <form id="calcForm" onsubmit="event.preventDefault();" class="space-y-6">
+                <!-- PROPERTY INPUTS -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-house text-brand-500"></i> Property Details
+                        </h3>
+                        <span class="text-xs text-slate-400">Nashville / Middle TN</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Property Address / Identifier</label>
+                            <input type="text" id="propAddress" value="123 Music Row, Nashville, TN 37203" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">
+                                Purchase Price ($) <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-3 text-slate-400 font-medium text-sm">$</span>
+                                <input type="number" id="purchasePrice" value="330000" oninput="app.calculateLive()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 pl-8 text-sm font-semibold focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                            <p id="errPrice" class="text-red-500 text-[11px] mt-1 hidden">Enter a valid purchase price greater than zero.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Property Taxes / Year ($)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-3 text-slate-400 font-medium text-sm">$</span>
+                                <input type="number" id="propertyTax" value="2850" oninput="app.calculateLive()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 pl-8 text-sm focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                            <p class="text-[11px] text-slate-400 mt-1">Approx $237.50 / month</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Homeowners Insurance / Year ($)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-3 text-slate-400 font-medium text-sm">$</span>
+                                <input type="number" id="homeInsurance" value="1440" oninput="app.calculateLive()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 pl-8 text-sm focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">HOA Dues / Month ($)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-3 text-slate-400 font-medium text-sm">$</span>
+                                <input type="number" id="hoaFee" value="75" oninput="app.calculateLive()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 pl-8 text-sm focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BUYER INPUTS -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <div class="border-b border-slate-100 pb-3 flex items-center justify-between">
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-user-check text-brand-500"></i> Buyer Financials & Down Payment
+                        </h3>
+                        <span class="text-xs text-slate-400">Synced $ and %</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Down Payment ($)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-3 text-slate-400 font-medium text-sm">$</span>
+                                <input type="number" id="downPaymentAmount" value="16500" oninput="app.syncDownPayment('amount')" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 pl-8 text-sm font-semibold focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                            <p id="errDown" class="text-red-500 text-[11px] mt-1 hidden">Down payment cannot exceed purchase price.</p>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Down Payment (%)</label>
+                            <div class="relative">
+                                <input type="number" id="downPaymentPercent" value="5" step="0.1" oninput="app.syncDownPayment('percent')" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 pr-8 text-sm font-semibold focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <span class="absolute right-3 top-3 text-slate-400 font-medium text-sm">%</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Credit Score Range</label>
+                            <select id="creditScore" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <option value="740+">740+ (Excellent)</option>
+                                <option value="700-739" selected>700 - 739 (Good)</option>
+                                <option value="660-699">660 - 699 (Fair)</option>
+                                <option value="620-659">620 - 659 (Minimum Conventional)</option>
+                                <option value="<620">&lt; 620 (FHA / VA typical)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Target Max Monthly Payment ($)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-3 text-slate-400 font-medium text-sm">$</span>
+                                <input type="number" id="targetMonthlyPayment" value="2500" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 pl-8 text-sm focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center pt-2">
+                    <button type="button" onclick="app.navigateTo('s3')" class="px-5 py-3 border border-slate-300 rounded-xl font-semibold text-slate-600 text-xs hover:bg-slate-100 transition">Cancel</button>
+                    <button type="button" onclick="app.navigateTo('s5')" class="px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm rounded-xl shadow-md transition flex items-center gap-2">
+                        <span>Continue to Loan Options</span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+            </form>
+        </section>
+
+        <!-- SCREEN 05: LOAN INPUT SCREEN (STEP 2) -->
+        <section id="s5" class="app-screen hidden max-w-3xl mx-auto space-y-6">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="flex items-center justify-between text-xs font-medium text-slate-500 mb-2">
+                    <span class="text-brand-500 font-bold">Step 2 of 5: Loan Specifications</span>
+                    <span>40% Complete</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div class="bg-brand-500 h-full w-[40%] transition-all"></div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div class="border-b border-slate-100 pb-3">
+                    <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-file-invoice-dollar text-brand-500"></i> Financing & Mortgage Terms
+                    </h3>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-2">Loan Program Type</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            <button type="button" onclick="app.setLoanType('Conventional')" id="loanTypeConv" class="loan-type-btn p-3 rounded-xl border border-brand-500 bg-brand-50 text-brand-700 font-bold text-xs text-center transition">Conventional</button>
+                            <button type="button" onclick="app.setLoanType('FHA')" id="loanTypeFHA" class="loan-type-btn p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 font-medium text-xs text-center transition">FHA</button>
+                            <button type="button" onclick="app.setLoanType('VA')" id="loanTypeVA" class="loan-type-btn p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 font-medium text-xs text-center transition">VA</button>
+                            <button type="button" onclick="app.setLoanType('USDA')" id="loanTypeUSDA" class="loan-type-btn p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 font-medium text-xs text-center transition">USDA</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Interest Rate (%)</label>
+                            <div class="relative">
+                                <input type="number" id="interestRate" value="6.50" step="0.125" oninput="app.calculateLive()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 pr-8 text-sm font-semibold focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <span class="absolute right-3 top-3 text-slate-400 font-medium text-sm">%</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Loan Term (Years)</label>
+                            <select id="loanTermYears" onchange="app.calculateLive()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                                <option value="30" selected>30 Years Fixed</option>
+                                <option value="20">20 Years Fixed</option>
+                                <option value="15">15 Years Fixed</option>
+                            </select>
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1 flex items-center justify-between">
+                                <span>PMI / MIP Monthly Estimate ($)</span>
+                                <span class="text-[11px] text-amber-600 font-normal"><i class="fa-solid fa-circle-info mr-1"></i>Auto-assumed if empty</span>
+                            </label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-3 text-slate-400 font-medium text-sm">$</span>
+                                <input type="number" id="pmiEstimate" placeholder="Auto calculated (e.g. $130)" oninput="app.calculateLive()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 pl-8 text-sm focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PMI Assumption Callout -->
+                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-800 space-y-1">
+                        <p class="font-bold flex items-center gap-1.5">
+                            <i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Explicit Assumption Notice
+                        </p>
+                        <p id="pmiAssumptionNotice">
+                            Down payment is under 20%. Estimating Conventional PMI at ~0.50% annual factor ($130.63/mo).
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-2">
+                <button type="button" onclick="app.navigateTo('s4')" class="px-5 py-3 border border-slate-300 rounded-xl font-semibold text-slate-600 text-xs hover:bg-slate-100 transition">Back</button>
+                <button type="button" onclick="app.navigateTo('s6')" class="px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm rounded-xl shadow-md transition flex items-center gap-2">
+                    <span>Seller & Closing Costs</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- SCREEN 06: SELLER CONTRIBUTIONS & CLOSING COSTS (STEP 3) -->
+        <section id="s6" class="app-screen hidden max-w-3xl mx-auto space-y-6">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="flex items-center justify-between text-xs font-medium text-slate-500 mb-2">
+                    <span class="text-brand-500 font-bold">Step 3 of 5: Seller Concessions & Fees</span>
+                    <span>60% Complete</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div class="bg-brand-500 h-full w-[60%] transition-all"></div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-handshake text-brand-500"></i> Seller Credits & Closing Costs
+                    </h3>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Requested Seller Concession ($)</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-3 text-slate-400 font-medium text-sm">$</span>
+                            <input type="number" id="sellerConcessionAmt" value="5000" oninput="app.syncSellerConcession('amount')" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 pl-8 text-sm font-semibold focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Seller Concession (%)</label>
+                        <div class="relative">
+                            <input type="number" id="sellerConcessionPct" value="1.52" step="0.1" oninput="app.syncSellerConcession('percent')" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 pr-8 text-sm font-semibold focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <span class="absolute right-3 top-3 text-slate-400 font-medium text-sm">%</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Buyer Lender & Settlement Fees ($)</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-3 text-slate-400 font-medium text-sm">$</span>
+                            <input type="number" id="buyerClosingCosts" value="6800" oninput="app.calculateLive()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 pl-8 text-sm focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Prepaid Taxes & Insurance Escrow ($)</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-3 text-slate-400 font-medium text-sm">$</span>
+                            <input type="number" id="prepaidEscrow" value="2850" oninput="app.calculateLive()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 pl-8 text-sm focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Earnest Money Already Paid ($)</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-3 text-slate-400 font-medium text-sm">$</span>
+                            <input type="number" id="earnestMoney" value="3300" oninput="app.calculateLive()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 pl-8 text-sm focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Summary Stack Panel -->
+                <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-2 text-xs">
+                    <div class="flex justify-between text-slate-600">
+                        <span>Total Buyer Closing Costs + Prepaids:</span>
+                        <span id="step3TotalClosingDisplay" class="font-bold text-slate-900">$9,650</span>
+                    </div>
+                    <div class="flex justify-between text-emerald-600 font-medium">
+                        <span>Less Seller Concessions Offered:</span>
+                        <span id="step3SellerCreditDisplay" class="font-bold">-$5,000</span>
+                    </div>
+                    <div class="flex justify-between text-blue-600 font-medium">
+                        <span>Less Earnest Money Deposit:</span>
+                        <span id="step3EarnestDisplay" class="font-bold">-$3,300</span>
+                    </div>
+                    <div class="border-t border-slate-200 pt-2 flex justify-between font-bold text-sm text-slate-900">
+                        <span>Net Net Settlement Cost Remaining:</span>
+                        <span id="step3NetSettlementDisplay" class="text-brand-500">$1,350</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-2">
+                <button type="button" onclick="app.navigateTo('s5')" class="px-5 py-3 border border-slate-300 rounded-xl font-semibold text-slate-600 text-xs hover:bg-slate-100 transition">Back</button>
+                <button type="button" onclick="app.navigateTo('s7')" class="px-6 py-3 bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm rounded-xl shadow-md transition flex items-center gap-2">
+                    <span>Rate Buydown Options</span>
+                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- SCREEN 07: RATE BUYDOWN INPUT (STEP 4) -->
+        <section id="s7" class="app-screen hidden max-w-3xl mx-auto space-y-6">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                <div class="flex items-center justify-between text-xs font-medium text-slate-500 mb-2">
+                    <span class="text-brand-500 font-bold">Step 4 of 5: Interest Rate Buydown Strategy</span>
+                    <span>80% Complete</span>
+                </div>
+                <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                    <div class="bg-brand-500 h-full w-[80%] transition-all"></div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-percent text-brand-500"></i> Rate Buydown Options
+                        </h3>
+                        <p class="text-xs text-slate-500">Base Note Rate: <span id="buydownBaseRateDisplay" class="font-bold text-slate-900">6.50%</span></p>
+                    </div>
+                </div>
+
+                <!-- Selectable Buydown Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div onclick="app.selectBuydown('none')" id="bdCardNone" class="buydown-card p-4 rounded-xl border-2 border-brand-500 bg-brand-50/50 cursor-pointer transition">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-sm">No Buydown</h4>
+                                <p class="text-xs text-slate-500">Standard market rate</p>
+                            </div>
+                            <span class="text-xs font-bold text-slate-900">6.50%</span>
+                        </div>
+                    </div>
+
+                    <div onclick="app.selectBuydown('1point')" id="bdCard1P" class="buydown-card p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 cursor-pointer transition">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-sm">1-Point Permanent</h4>
+                                <p class="text-xs text-slate-500">Est Cost: ~$3,135 (1% loan)</p>
+                            </div>
+                            <span class="text-xs font-bold text-emerald-600">6.25%</span>
+                        </div>
+                    </div>
+
+                    <div onclick="app.selectBuydown('2point')" id="bdCard2P" class="buydown-card p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 cursor-pointer transition">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-sm">2-Point Permanent</h4>
+                                <p class="text-xs text-slate-500">Est Cost: ~$6,270 (2% loan)</p>
+                            </div>
+                            <span class="text-xs font-bold text-emerald-600">6.00%</span>
+                        </div>
+                    </div>
+
+                    <div onclick="app.selectBuydown('321')" id="bdCard321" class="buydown-card p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 cursor-pointer transition">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-bold text-slate-900 text-sm">3-2-1 Temporary</h4>
+                                <p class="text-xs text-slate-500">Yr 1: 3.50% | Yr 2: 4.50% | Yr 3: 5.50%</p>
+                            </div>
+                            <span class="text-xs font-bold text-emerald-600">3.50% Start</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Override -->
+                <div class="border-t border-slate-100 pt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Effective Reduced Rate (%)</label>
+                        <input type="number" id="effectiveRate" value="6.50" step="0.125" oninput="app.calculateLive()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm font-bold focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Estimated Buydown Cost ($)</label>
+                        <input type="number" id="buydownCost" value="0" oninput="app.calculateLive()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <!-- Dynamic Preview -->
+                <div id="buydownPreviewBox" class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex justify-between items-center text-xs text-emerald-900">
+                    <div>
+                        <span class="font-bold block text-sm">Monthly P&amp;I Savings: <span id="bdMonthlySavingsDisplay">$0.00</span> / mo</span>
+                        <span class="text-emerald-700">Annual Savings: <span id="bdAnnualSavingsDisplay">$0.00</span></span>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-bold block">Break-even:</span>
+                        <span id="bdBreakEvenDisplay" class="text-slate-600 font-semibold">N/A (No buydown)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center pt-2">
+                <button type="button" onclick="app.navigateTo('s6')" class="px-5 py-3 border border-slate-300 rounded-xl font-semibold text-slate-600 text-xs hover:bg-slate-100 transition">Back</button>
+                <button type="button" onclick="app.navigateTo('s8')" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-lg transition flex items-center gap-2">
+                    <span>View Complete Analysis</span>
+                    <i class="fa-solid fa-chart-pie text-xs"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- SCREEN 08: MAIN RESULTS DASHBOARD -->
+        <section id="s8" class="app-screen hidden space-y-6">
+            <!-- Header Bar with Quick Scenario Actions -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <div>
+                    <span class="text-xs font-bold text-brand-500 uppercase tracking-wider">Analysis Complete</span>
+                    <h2 class="text-xl sm:text-2xl font-extrabold text-slate-900" id="resultsAddressTitle">123 Music Row, Nashville, TN</h2>
+                    <p class="text-xs text-slate-500">Target Purchase Price: <span id="resultsPriceTitle" class="font-bold text-slate-800">$330,000</span> | Conventional 30-Yr Fixed</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button onclick="app.navigateTo('s4')" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                    </button>
+                    <button onclick="app.saveCurrentScenario()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+                        <i class="fa-regular fa-bookmark"></i> Save
+                    </button>
+                    <button onclick="app.navigateTo('s10')" class="px-3.5 py-2 bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-xl text-xs font-semibold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-code-compare"></i> Compare
+                    </button>
+                    <button onclick="app.navigateTo('s15')" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold transition shadow flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-pdf"></i> Report
+                    </button>
+                </div>
+            </div>
+
+            <!-- TWO LARGE PRIMARY HERO CARDS (PROMINENT KEY NUMBERS) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- CARD 1: ESTIMATED MONTHLY PAYMENT -->
+                <div class="bg-gradient-to-br from-slate-900 via-brand-700 to-slate-900 text-white p-6 sm:p-8 rounded-3xl shadow-xl relative overflow-hidden border border-slate-800">
+                    <div class="absolute right-0 top-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl"></div>
+                    <span class="text-xs font-extrabold uppercase tracking-widest text-emerald-400 block mb-1">Key Number 01</span>
+                    <h3 class="text-slate-300 text-sm font-semibold mb-3">ESTIMATED MONTHLY PAYMENT</h3>
+                    <div class="flex items-baseline gap-2 mb-4">
+                        <span id="resultsMonthlyPayment" class="text-4xl sm:text-5xl font-black text-white tracking-tight">$2,418</span>
+                        <span class="text-slate-400 font-medium text-sm">/ month</span>
+                    </div>
+                    <div class="bg-white/10 rounded-xl p-3 backdrop-blur-md border border-white/10 text-xs flex justify-between items-center text-slate-200">
+                        <span>Includes P&amp;I, Taxes, Ins, HOA &amp; PMI</span>
+                        <span class="text-emerald-400 font-bold"><i class="fa-solid fa-circle-check"></i> Estimated</span>
+                    </div>
+                </div>
+
+                <!-- CARD 2: ESTIMATED CASH TO CLOSE -->
+                <div class="bg-gradient-to-br from-slate-900 via-brand-600 to-slate-900 text-white p-6 sm:p-8 rounded-3xl shadow-xl relative overflow-hidden border border-slate-800">
+                    <div class="absolute right-0 top-0 w-32 h-32 bg-amber-500/10 rounded-full blur-3xl"></div>
+                    <span class="text-xs font-extrabold uppercase tracking-widest text-amber-300 block mb-1">Key Number 02</span>
+                    <h3 class="text-slate-300 text-sm font-semibold mb-3">ESTIMATED CASH TO CLOSE</h3>
+                    <div class="flex items-baseline gap-2 mb-4">
+                        <span id="resultsCashToClose" class="text-4xl sm:text-5xl font-black text-amber-300 tracking-tight">$24,850</span>
+                        <span class="text-slate-400 font-medium text-sm">due at settlement</span>
+                    </div>
+                    <div class="bg-white/10 rounded-xl p-3 backdrop-blur-md border border-white/10 text-xs flex justify-between items-center text-slate-200">
+                        <span>Net of Seller Concessions &amp; Earnest Money</span>
+                        <span class="text-amber-300 font-bold"><i class="fa-solid fa-shield-halved"></i> Estimated</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAYMENT BREAKDOWN & PURCHASE SUMMARY GRID -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Payment Breakdown Visual Chart & Stack -->
+                <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <h3 class="font-bold text-slate-900 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie text-brand-500"></i> Monthly Payment Breakdown
+                        </h3>
+                        <span id="resultsTotalMonthlyBadge" class="text-xs font-bold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-full">$2,418.13 / mo</span>
+                    </div>
+
+                    <!-- Visual Segmented Bar Chart -->
+                    <div>
+                        <div class="h-5 w-full bg-slate-100 rounded-full overflow-hidden flex shadow-inner mb-3">
+                            <div id="barPI" style="width: 70%" class="bg-brand-500 h-full" title="Principal & Interest"></div>
+                            <div id="barTax" style="width: 12%" class="bg-blue-500 h-full" title="Property Taxes"></div>
+                            <div id="barIns" style="width: 6%" class="bg-purple-500 h-full" title="Home Insurance"></div>
+                            <div id="barHOA" style="width: 4%" class="bg-amber-500 h-full" title="HOA Fees"></div>
+                            <div id="barPMI" style="width: 8%" class="bg-emerald-500 h-full" title="PMI / MIP"></div>
+                        </div>
+
+                        <!-- Legend Items -->
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 text-xs">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded bg-brand-500"></span>
+                                <div>
+                                    <span class="text-slate-500 block">Principal &amp; Interest</span>
+                                    <span id="breakdownPI" class="font-bold text-slate-900">$1,984.63</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded bg-blue-500"></span>
+                                <div>
+                                    <span class="text-slate-500 block">Property Taxes</span>
+                                    <span id="breakdownTaxes" class="font-bold text-slate-900">$237.50</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded bg-purple-500"></span>
+                                <div>
+                                    <span class="text-slate-500 block">Homeowners Insurance</span>
+                                    <span id="breakdownInsurance" class="font-bold text-slate-900">$120.00</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded bg-amber-500"></span>
+                                <div>
+                                    <span class="text-slate-500 block">HOA Dues</span>
+                                    <span id="breakdownHOA" class="font-bold text-slate-900">$75.00</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded bg-emerald-500"></span>
+                                <div>
+                                    <span class="text-slate-500 block">PMI / MIP Estimate</span>
+                                    <span id="breakdownPMI" class="font-bold text-slate-900">$130.63</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Purchase Summary Panel -->
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="font-bold text-slate-900 text-base border-b border-slate-100 pb-3 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-brand-500"></i> Loan Summary
+                    </h3>
+                    <div class="space-y-2.5 text-xs">
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Purchase Price:</span>
+                            <span id="sumPrice" class="font-bold text-slate-900">$330,000</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Down Payment:</span>
+                            <span id="sumDown" class="font-bold text-slate-900">$16,500 (5.0%)</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Base Loan Amount:</span>
+                            <span id="sumLoan" class="font-bold text-slate-900">$313,500</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Interest Rate:</span>
+                            <span id="sumRate" class="font-bold text-slate-900">6.50%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Loan Term:</span>
+                            <span id="sumTerm" class="font-bold text-slate-900">30 Years</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-500">Seller Concessions:</span>
+                            <span id="sumConcessions" class="font-bold text-emerald-600">$5,000</span>
+                        </div>
+                    </div>
+                    
+                    <div class="pt-2">
+                        <button onclick="app.navigateTo('s13')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-1.5">
+                            <span>View Itemized Cash Stack</span>
+                            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Standard Advisory Disclaimer Footer -->
+            <div class="bg-slate-100 rounded-xl p-4 text-[11px] text-slate-500 leading-relaxed border border-slate-200">
+                <strong>Important Legal Notice:</strong> Estimates are for educational and planning purposes only. Actual mortgage rates, property taxes, homeowners insurance, closing costs, loan-program requirements, seller-concession limits, PMI/MIP factors, and lender qualification criteria may vary. Verify final numbers with a licensed mortgage lender, title provider, and real-estate professional. This tool does not provide legal, tax, or lending advice.
+            </div>
+        </section>
+
+        <!-- SCREEN 09: MAXIMUM PURCHASE PRICE / REVERSE CALCULATOR -->
+        <section id="s9" class="app-screen hidden max-w-3xl mx-auto space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div class="border-b border-slate-100 pb-3">
+                    <span class="text-xs font-bold text-brand-500 uppercase tracking-wider">Reverse Budgeting</span>
+                    <h2 class="text-xl font-extrabold text-slate-900">Estimated Maximum Purchase Price</h2>
+                    <p class="text-xs text-slate-500">Determine maximum home value based on desired monthly payment capacity.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Desired Target Monthly Payment ($)</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-3 text-slate-400 font-medium text-sm">$</span>
+                            <input type="number" id="revTargetPayment" value="2500" oninput="app.calculateReverseMax()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 pl-8 text-sm font-bold focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Expected Down Payment (%)</label>
+                        <div class="relative">
+                            <input type="number" id="revDownPct" value="5" step="0.5" oninput="app.calculateReverseMax()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 pr-8 text-sm focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                            <span class="absolute right-3 top-3 text-slate-400 font-medium text-sm">%</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Assumed Interest Rate (%)</label>
+                        <input type="number" id="revInterestRate" value="6.50" step="0.125" oninput="app.calculateReverseMax()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Estimated Monthly Taxes &amp; Ins ($)</label>
+                        <input type="number" id="revTaxIns" value="360" oninput="app.calculateReverseMax()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm focus:bg-white focus:ring-2 focus:ring-brand-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <!-- Reverse Calculation Output Card -->
+                <div class="bg-gradient-to-r from-brand-700 to-slate-900 text-white p-6 rounded-2xl shadow-lg space-y-4">
+                    <span class="text-xs font-extrabold uppercase tracking-widest text-brand-accent">Estimated Purchasing Power</span>
+                    <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
+                        <div>
+                            <span class="text-xs text-slate-300 block">ESTIMATED MAXIMUM PURCHASE PRICE</span>
+                            <span id="revMaxPriceOutput" class="text-3xl sm:text-4xl font-black text-white">$341,200</span>
+                        </div>
+                        <div class="text-left sm:text-right">
+                            <span class="text-xs text-slate-300 block">Monthly Payment at Max Price</span>
+                            <span id="revActualPaymentOutput" class="text-xl font-bold text-emerald-400">$2,500 / mo</span>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed border-t border-slate-700 pt-3">
+                        This estimate accounts for principal, interest, taxes, insurance, and estimated PMI. Actual lender qualification and maximum purchasing power will depend on Debt-to-Income (DTI) ratios and underwriting guidelines.
+                    </p>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <button onclick="app.useMaxPriceInCalc()" class="px-5 py-3 bg-brand-500 hover:bg-brand-600 text-white font-bold rounded-xl text-xs shadow transition">
+                        Use This Max Price In Main Calculator
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 10: OFFER COMPARISON (UP TO 4 OFFERS) -->
+        <section id="s10" class="app-screen hidden space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <div>
+                    <span class="text-xs font-bold text-purple-600 uppercase tracking-wider">Multi-Offer Analysis</span>
+                    <h2 class="text-xl font-extrabold text-slate-900">Compare Up To 4 Purchase Scenarios</h2>
+                    <p class="text-xs text-slate-500">Evaluate price, seller concessions, and rate buydown variations side-by-side.</p>
+                </div>
+                <button onclick="app.resetOffersToDefault()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition">
+                    Reset Defaults
+                </button>
+            </div>
+
+            <!-- Mobile Horizontally Scrollable / Stacked Comparison Matrix -->
+            <div class="overflow-x-auto pb-4 no-scrollbar">
+                <div class="min-w-[700px] grid grid-cols-5 gap-3">
+                    <!-- Column Header Labels -->
+                    <div class="space-y-4 pt-12 text-xs font-bold text-slate-500">
+                        <div class="h-10 flex items-center">Purchase Price</div>
+                        <div class="h-10 flex items-center">Down Payment</div>
+                        <div class="h-10 flex items-center">Interest Rate</div>
+                        <div class="h-10 flex items-center">Seller Concession</div>
+                        <div class="h-12 flex items-center bg-emerald-50 px-2 rounded font-bold text-emerald-800">Monthly Payment</div>
+                        <div class="h-12 flex items-center bg-amber-50 px-2 rounded font-bold text-amber-800">Cash To Close</div>
+                    </div>
+
+                    <!-- OFFER A -->
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="text-center pb-2 border-b border-slate-100">
+                            <span class="bg-brand-500 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">Offer A</span>
+                            <h4 class="font-bold text-slate-900 text-sm mt-1">Asking Price</h4>
+                        </div>
+                        <input type="number" value="330000" id="offPriceA" oninput="app.recalcOffers()" class="h-10 w-full bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold p-2">
+                        <input type="number" value="16500" id="offDownA" oninput="app.recalcOffers()" class="h-10 w-full bg-slate-50 border border-slate-300 rounded-xl text-xs p-2">
+                        <input type="number" value="6.50" id="offRateA" step="0.125" oninput="app.recalcOffers()" class="h-10 w-full bg-slate-50 border border-slate-300 rounded-xl text-xs p-2">
+                        <input type="number" value="0" id="offSellerA" oninput="app.recalcOffers()" class="h-10 w-full bg-slate-50 border border-slate-300 rounded-xl text-xs p-2">
+                        <div id="offPayA" class="h-12 bg-emerald-50 text-emerald-700 font-extrabold text-sm flex items-center justify-center rounded-xl">$2,418</div>
+                        <div id="offCashA" class="h-12 bg-amber-50 text-amber-700 font-extrabold text-sm flex items-center justify-center rounded-xl">$29,850</div>
+                    </div>
+
+                    <!-- OFFER B -->
+                    <div class="bg-white p-4 rounded-2xl border border-brand-500 shadow-md space-y-4 relative">
+                        <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-brand-500 text-white text-[9px] font-extrabold px-2 py-0.5 rounded-full">RECOMMENDED</span>
+                        <div class="text-center pb-2 border-b border-slate-100">
+                            <span class="bg-brand-500 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">Offer B</span>
+                            <h4 class="font-bold text-slate-900 text-sm mt-1">+Concessions</h4>
+                        </div>
+                        <input type="number" value="335000" id="offPriceB" oninput="app.recalcOffers()" class="h-10 w-full bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold p-2">
+                        <input type="number" value="16750" id="offDownB" oninput="app.recalcOffers()" class="h-10 w-full bg-slate-50 border border-slate-300 rounded-xl text-xs p-2">
+                        <input type="number" value="6.50" id="offRateB" step="0.125" oninput="app.recalcOffers()" class="h-10 w-full bg-slate-50 border border-slate-300 rounded-xl text-xs p-2">
+                        <input type="number" value="5000" id="offSellerB" oninput="app.recalcOffers()" class="h-10 w-full bg-slate-50 border border-slate-300 rounded-xl text-xs p-2">
+                        <div id="offPayB" class="h-12 bg-emerald-50 text-emerald-700 font-extrabold text-sm flex items-center justify-center rounded-xl">$2,449</div>
+                        <div id="offCashB" class="h-12 bg-amber-50 text-amber-700 font-extrabold text-sm flex items-center justify-center rounded-xl">$25,100</div>
+                    </div>
+
+                    <!-- OFFER C -->
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                        <div class="text-center pb-2 border-b border-slate-100">
+                            <span class="bg-brand-500 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">Offer C</span>
+                            <h4 class="font-bold text-slate-900 text-sm mt-1">Rate Buydown</h4>
+                        </div>
+                        <input type="number" value="335000" id="offPriceC" oninput="app.recalcOffers()" class="h-10 w-full bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold p-2">
+                        <input type="number" value="16750" id="offDownC" oninput="app.recalcOffers()" class="h-10 w-full bg-slate-50 border border-slate-300 rounded-xl text-xs p-2">
+                        <input type="number" value="6.00" id="offRateC" step="0.125" oninput="app.recalcOffers()" class="h-10 w-full bg-slate-50 border border-slate-300 rounded-xl text-xs p-2">
+                        <input type="number" value="6300" id="offSellerC" oninput="app.recalcOffers()" class="h-10 w-full bg-slate-50 border border-slate-300 rounded-xl text-xs p-2">
+                        <div id="offPayC" class="h-12 bg-emerald-50 text-emerald-700 font-extrabold text-sm flex items-center justify-center rounded-xl">$2,345</div>
+                        <div id="offCashC" class="h-12 bg-amber-50 text-amber-700 font-extrabold text-sm flex items-center justify-center rounded-xl">$23,800</div>
+                    </div>
+
+                    <!-- OFFER D -->
+                    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm space-y-4 opacity-75">
+                        <div class="text-center pb-2 border-b border-slate-100">
+                            <span class="bg-brand-500 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">Offer D</span>
+                            <h4 class="font-bold text-slate-900 text-sm mt-1">Lower Price</h4>
+                        </div>
+                        <input type="number" value="325000" id="offPriceD" oninput="app.recalcOffers()" class="h-10 w-full bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold p-2">
+                        <input type="number" value="16250" id="offDownD" oninput="app.recalcOffers()" class="h-10 w-full bg-slate-50 border border-slate-300 rounded-xl text-xs p-2">
+                        <input type="number" value="6.50" id="offRateD" step="0.125" oninput="app.recalcOffers()" class="h-10 w-full bg-slate-50 border border-slate-300 rounded-xl text-xs p-2">
+                        <input type="number" value="0" id="offSellerD" oninput="app.recalcOffers()" class="h-10 w-full bg-slate-50 border border-slate-300 rounded-xl text-xs p-2">
+                        <div id="offPayD" class="h-12 bg-emerald-50 text-emerald-700 font-extrabold text-sm flex items-center justify-center rounded-xl">$2,386</div>
+                        <div id="offCashD" class="h-12 bg-amber-50 text-amber-700 font-extrabold text-sm flex items-center justify-center rounded-xl">$29,350</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 11: SELLER CONCESSION CALCULATOR -->
+        <section id="s11" class="app-screen hidden max-w-3xl mx-auto space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div class="border-b border-slate-100 pb-3">
+                    <span class="text-xs font-bold text-brand-500 uppercase tracking-wider">Program Limit Validation</span>
+                    <h2 class="text-xl font-extrabold text-slate-900">Seller Concession Calculator &amp; Limits</h2>
+                    <p class="text-xs text-slate-500">Ensure seller contributions stay within loan program guidelines.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Selected Loan Program</label>
+                        <select id="concProgSelect" onchange="app.validateConcessions()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm font-semibold">
+                            <option value="Conv3">Conventional (&lt; 10% Down) — Max 3%</option>
+                            <option value="Conv6">Conventional (10% - 25% Down) — Max 6%</option>
+                            <option value="FHA">FHA Loan — Max 6%</option>
+                            <option value="VA">VA Loan — Max 4% (plus standard closing costs)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Requested Seller Contribution ($)</label>
+                        <input type="number" id="concReqAmount" value="12000" oninput="app.validateConcessions()" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-3 text-sm font-bold">
+                    </div>
+                </div>
+
+                <!-- Warning Banner state -->
+                <div id="concWarningBanner" class="bg-red-50 border border-red-200 text-red-800 rounded-xl p-4 text-xs space-y-1">
+                    <p class="font-bold flex items-center gap-1.5">
+                        <i class="fa-solid fa-triangle-exclamation text-red-600"></i>
+                        Requested contribution exceeds configured program limit!
+                    </p>
+                    <p id="concWarningText">
+                        The requested $12,000 exceeds the maximum allowed 3% limit ($9,900) for Conventional loans with &lt;10% down. Verify lender rules.
+                    </p>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs space-y-2">
+                    <div class="flex justify-between">
+                        <span class="text-slate-600">Maximum Allowed Program Contribution:</span>
+                        <span id="concMaxAllowedDisplay" class="font-bold text-slate-900">$9,900</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-600">Remaining Buyer Closing Costs to Cover:</span>
+                        <span id="concNetBuyerCostDisplay" class="font-bold text-brand-500">$0.00</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 12: RATE BUYDOWN COMPARISON GRID -->
+        <section id="s12" class="app-screen hidden max-w-4xl mx-auto space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                    <div>
+                        <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider">Financial Analysis</span>
+                        <h2 class="text-xl font-extrabold text-slate-900">Rate Buydown Break-Even Matrix</h2>
+                    </div>
+                    <span class="text-xs font-bold bg-slate-100 px-3 py-1 rounded-full text-slate-700">Base Note: 6.50%</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Base -->
+                    <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+                        <h4 class="font-bold text-slate-900 text-sm">6.50% Base</h4>
+                        <div class="text-xs space-y-1">
+                            <p class="text-slate-500">Monthly P&amp;I: <span class="font-bold text-slate-900">$1,984.63</span></p>
+                            <p class="text-slate-500">Monthly Savings: <span class="font-bold">$0.00</span></p>
+                            <p class="text-slate-500">Buydown Cost: <span class="font-bold">$0</span></p>
+                        </div>
+                        <div class="bg-slate-200 text-slate-700 p-2 rounded text-[11px] font-bold text-center">
+                            Baseline Rate
+                        </div>
+                    </div>
+
+                    <!-- 6.25% -->
+                    <div class="bg-white p-4 rounded-2xl border border-emerald-200 shadow-sm space-y-3">
+                        <h4 class="font-bold text-emerald-700 text-sm">6.25% (-0.25%)</h4>
+                        <div class="text-xs space-y-1">
+                            <p class="text-slate-500">Monthly P&amp;I: <span class="font-bold text-slate-900">$1,931.39</span></p>
+                            <p class="text-slate-500">Monthly Savings: <span class="font-bold text-emerald-600">$53.24</span></p>
+                            <p class="text-slate-500">Buydown Cost: <span class="font-bold">$3,135</span></p>
+                        </div>
+                        <div class="bg-emerald-50 text-emerald-800 p-2 rounded text-[11px] font-bold text-center border border-emerald-200">
+                            Break-even: 59 Months
+                        </div>
+                    </div>
+
+                    <!-- 6.00% -->
+                    <div class="bg-white p-4 rounded-2xl border border-emerald-200 shadow-sm space-y-3">
+                        <h4 class="font-bold text-emerald-700 text-sm">6.00% (-0.50%)</h4>
+                        <div class="text-xs space-y-1">
+                            <p class="text-slate-500">Monthly P&amp;I: <span class="font-bold text-slate-900">$1,879.52</span></p>
+                            <p class="text-slate-500">Monthly Savings: <span class="font-bold text-emerald-600">$105.11</span></p>
+                            <p class="text-slate-500">Buydown Cost: <span class="font-bold">$6,270</span></p>
+                        </div>
+                        <div class="bg-emerald-50 text-emerald-800 p-2 rounded text-[11px] font-bold text-center border border-emerald-200">
+                            Break-even: 60 Months
+                        </div>
+                    </div>
+
+                    <!-- 5.75% -->
+                    <div class="bg-white p-4 rounded-2xl border border-emerald-200 shadow-sm space-y-3">
+                        <h4 class="font-bold text-emerald-700 text-sm">5.75% (-0.75%)</h4>
+                        <div class="text-xs space-y-1">
+                            <p class="text-slate-500">Monthly P&amp;I: <span class="font-bold text-slate-900">$1,828.98</span></p>
+                            <p class="text-slate-500">Monthly Savings: <span class="font-bold text-emerald-600">$155.65</span></p>
+                            <p class="text-slate-500">Buydown Cost: <span class="font-bold">$9,405</span></p>
+                        </div>
+                        <div class="bg-emerald-50 text-emerald-800 p-2 rounded text-[11px] font-bold text-center border border-emerald-200">
+                            Break-even: 60 Months
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 13: CASH-TO-CLOSE FINANCIAL STACK SUMMARY -->
+        <section id="s13" class="app-screen hidden max-w-3xl mx-auto space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                    <div>
+                        <span class="text-xs font-bold text-amber-600 uppercase tracking-wider">Settlement Breakdown</span>
+                        <h2 class="text-xl font-extrabold text-slate-900">Estimated Cash-to-Close Stack</h2>
+                    </div>
+                    <button onclick="window.print()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold">
+                        <i class="fa-solid fa-print"></i> Print
+                    </button>
+                </div>
+
+                <!-- Calculation Stack Visual -->
+                <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 space-y-3 font-mono text-xs sm:text-sm">
+                    <div class="flex justify-between items-center text-slate-700">
+                        <span>+ Down Payment Required (5%):</span>
+                        <span id="stackDown" class="font-bold">$16,500.00</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700">
+                        <span>+ Buyer Closing Fees &amp; Settlement:</span>
+                        <span id="stackClosing" class="font-bold">$6,800.00</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700">
+                        <span>+ Prepaid Taxes &amp; Insurance Escrow:</span>
+                        <span id="stackPrepaids" class="font-bold">$2,850.00</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700">
+                        <span>+ Rate Buydown Cost:</span>
+                        <span id="stackBuydown" class="font-bold">$0.00</span>
+                    </div>
+
+                    <div class="border-t border-slate-300 pt-2 flex justify-between items-center font-bold text-slate-900">
+                        <span>= ESTIMATED TOTAL FUNDS REQUIRED:</span>
+                        <span id="stackTotalFunds" class="text-base text-slate-900">$26,150.00</span>
+                    </div>
+
+                    <div class="flex justify-between items-center text-emerald-600">
+                        <span>− Less Seller Concessions Credit:</span>
+                        <span id="stackConcessions" class="font-bold">-$5,000.00</span>
+                    </div>
+                    <div class="flex justify-between items-center text-blue-600">
+                        <span>− Less Earnest Money Deposit Already Paid:</span>
+                        <span id="stackEarnest" class="font-bold">-$3,300.00</span>
+                    </div>
+
+                    <div class="border-t-2 border-slate-900 pt-3 flex justify-between items-center font-black text-base sm:text-lg text-brand-500 bg-white p-3 rounded-xl shadow-sm">
+                        <span>= ESTIMATED CASH TO CLOSE:</span>
+                        <span id="stackCashToClose" class="text-amber-600">$17,850.00</span>
+                    </div>
+                </div>
+
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 text-xs text-blue-900">
+                    <strong>Distinction Note:</strong> "Total Funds Required" represents gross out-of-pocket obligation before credits. "Cash To Close" is the actual check or wire required on closing day after subtracting earnest money and seller credits.
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 14: OFFER STRATEGY ANALYZER -->
+        <section id="s14" class="app-screen hidden max-w-3xl mx-auto space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div class="border-b border-slate-100 pb-3">
+                    <span class="text-xs font-bold text-brand-500 uppercase tracking-wider">Advisor Intelligence</span>
+                    <h2 class="text-xl font-extrabold text-slate-900">Factual Offer Strategy Scenarios</h2>
+                    <p class="text-xs text-slate-500">Neutral financial evaluation across asking price, comps, and days on market.</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Asking Price ($)</label>
+                        <input type="number" id="stratAskingPrice" value="330000" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Days on Market (DOM)</label>
+                        <input type="number" id="stratDOM" value="42" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Comp Valuation Average ($)</label>
+                        <input type="number" id="stratComps" value="328000" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5 text-xs">
+                    </div>
+                </div>
+
+                <!-- Generated Scenario Table -->
+                <div class="space-y-3">
+                    <h4 class="font-bold text-xs uppercase tracking-wider text-slate-500">Scenario Projections</h4>
+                    
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex justify-between items-center text-xs">
+                        <div>
+                            <span class="font-bold text-slate-900 block text-sm">Offer at $325,000 (-$5k under asking)</span>
+                            <span class="text-slate-500">Reflects 42 days on market negotiation leverage.</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-bold text-emerald-600 block">$2,386 / mo</span>
+                            <span class="text-amber-600 font-semibold">$24,350 Cash to Close</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border-2 border-brand-500 shadow-sm flex justify-between items-center text-xs">
+                        <div>
+                            <span class="font-bold text-slate-900 block text-sm">Offer at $330,000 (Full Asking)</span>
+                            <span class="text-slate-500">Standard market value alignment.</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-bold text-emerald-600 block">$2,418 / mo</span>
+                            <span class="text-amber-600 font-semibold">$24,850 Cash to Close</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex justify-between items-center text-xs">
+                        <div>
+                            <span class="font-bold text-slate-900 block text-sm">Offer at $335,000 + $5k Seller Credit</span>
+                            <span class="text-slate-500">Preserves buyer cash reserves at closing.</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-bold text-emerald-600 block">$2,449 / mo</span>
+                            <span class="text-amber-600 font-semibold">$20,100 Cash to Close</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 15: PROFESSIONAL OFFER SUMMARY REPORT -->
+        <section id="s15" class="app-screen hidden max-w-4xl mx-auto space-y-6">
+            <!-- Action Toolbar (Hidden in Print) -->
+            <div class="no-print flex flex-wrap items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-sm">
+                <div>
+                    <h3 class="font-bold text-slate-900 text-sm">Client Offer Summary Report</h3>
+                    <p class="text-xs text-slate-500">Formatted for print, email PDF, or digital presentation.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="window.print()" class="px-4 py-2 bg-brand-500 hover:bg-brand-600 text-white rounded-xl text-xs font-bold transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-print"></i> Print / Save PDF
+                    </button>
+                    <button onclick="app.copySummaryText()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition">
+                        <i class="fa-regular fa-copy"></i> Copy Text
+                    </button>
+                </div>
+            </div>
+
+            <!-- PRINTABLE BRANDED REPORT CANVAS -->
+            <div class="bg-white p-8 sm:p-12 rounded-3xl border border-slate-200 shadow-xl print-card space-y-8">
+                <!-- Report Header -->
+                <div class="flex justify-between items-start border-b-2 border-brand-500 pb-6">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-widest text-brand-accent">Official Summary</span>
+                        <h1 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">HOME OFFER SUMMARY</h1>
+                        <p id="reportPropAddress" class="text-sm font-semibold text-slate-600 mt-1">123 Music Row, Nashville, TN 37203</p>
+                        <p class="text-xs text-slate-400 mt-0.5">Prepared on: <span id="reportDate">October 1, 2026</span></p>
+                    </div>
+
+                    <div class="text-right border-l border-slate-200 pl-6">
+                        <p class="font-extrabold text-slate-900 text-sm">Tracie Robinson</p>
+                        <p class="text-xs text-slate-600">REALTOR® / Affiliate Broker</p>
+                        <p class="text-xs font-bold text-brand-500">Benchmark Realty, LLC</p>
+                        <p class="text-[11px] text-slate-400">Nashville Metropolitan Area</p>
+                    </div>
+                </div>
+
+                <!-- Dual Key Results Banner -->
+                <div class="grid grid-cols-2 gap-4 bg-slate-900 text-white p-6 rounded-2xl">
+                    <div>
+                        <span class="text-[10px] uppercase font-bold text-emerald-400 block tracking-wider">Estimated Monthly Payment</span>
+                        <span id="reportMonthlyDisplay" class="text-2xl sm:text-3xl font-black text-white">$2,418.13</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] uppercase font-bold text-amber-300 block tracking-wider">Estimated Cash To Close</span>
+                        <span id="reportCashDisplay" class="text-2xl sm:text-3xl font-black text-amber-300">$24,850.00</span>
+                    </div>
+                </div>
+
+                <!-- Two-Column Breakdown Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-xs">
+                    <!-- Purchase & Loan Details -->
+                    <div class="space-y-3">
+                        <h3 class="font-bold text-slate-900 border-b border-slate-200 pb-2 uppercase text-xs tracking-wider">Purchase &amp; Financing Terms</h3>
+                        <div class="flex justify-between text-slate-600"><span>Purchase Price:</span><span id="repPrice" class="font-bold text-slate-900">$330,000</span></div>
+                        <div class="flex justify-between text-slate-600"><span>Down Payment:</span><span id="repDown" class="font-bold text-slate-900">$16,500 (5%)</span></div>
+                        <div class="flex justify-between text-slate-600"><span>Base Loan Amount:</span><span id="repLoan" class="font-bold text-slate-900">$313,500</span></div>
+                        <div class="flex justify-between text-slate-600"><span>Interest Rate:</span><span id="repRate" class="font-bold text-slate-900">6.50%</span></div>
+                        <div class="flex justify-between text-slate-600"><span>Loan Term:</span><span id="repTerm" class="font-bold text-slate-900">30 Years Fixed</span></div>
+                        <div class="flex justify-between text-slate-600"><span>Seller Concessions Requested:</span><span id="repSellerConc" class="font-bold text-emerald-600">$5,000</span></div>
+                    </div>
+
+                    <!-- Payment Breakdown -->
+                    <div class="space-y-3">
+                        <h3 class="font-bold text-slate-900 border-b border-slate-200 pb-2 uppercase text-xs tracking-wider">Itemized Monthly Outlay</h3>
+                        <div class="flex justify-between text-slate-600"><span>Principal &amp; Interest:</span><span id="repPI" class="font-bold text-slate-900">$1,984.63</span></div>
+                        <div class="flex justify-between text-slate-600"><span>Property Taxes:</span><span id="repTax" class="font-bold text-slate-900">$237.50</span></div>
+                        <div class="flex justify-between text-slate-600"><span>Homeowners Insurance:</span><span id="repIns" class="font-bold text-slate-900">$120.00</span></div>
+                        <div class="flex justify-between text-slate-600"><span>HOA Dues:</span><span id="repHOA" class="font-bold text-slate-900">$75.00</span></div>
+                        <div class="flex justify-between text-slate-600"><span>PMI / MIP Estimate:</span><span id="repPMI" class="font-bold text-slate-900">$130.63</span></div>
+                        <div class="border-t border-slate-200 pt-2 flex justify-between font-extrabold text-sm text-slate-900">
+                            <span>Total Monthly Outlay:</span>
+                            <span id="repTotalMonthly" class="text-brand-500">$2,418.13</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer Disclaimer -->
+                <div class="border-t border-slate-200 pt-6 text-[10px] text-slate-400 leading-relaxed space-y-1">
+                    <p><strong>Disclaimer:</strong> Prepared with Home Offer Calculator by Tracie Robinson, REALTOR® | Benchmark Realty, LLC. Estimates are strictly for planning purposes. Actual interest rates, taxes, insurance, settlement fees, and qualification standards are subject to final lender and title company verification.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 16: SAVED SCENARIOS -->
+        <section id="s16" class="app-screen hidden space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                <div>
+                    <h2 class="text-xl font-extrabold text-slate-900">Saved Property Scenarios</h2>
+                    <p class="text-xs text-slate-500">Access and manage buyer offer calculations.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="text" id="scenarioSearch" placeholder="Search property address..." oninput="app.filterScenarios()" class="bg-slate-50 border border-slate-300 rounded-xl p-2 px-3 text-xs w-48 focus:outline-none">
+                    <button onclick="app.startNewCalculation()" class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-3.5 py-2 rounded-xl text-xs transition">
+                        + New
+                    </button>
+                </div>
+            </div>
+
+            <div id="savedScenariosFullList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Rendered dynamically -->
+            </div>
+        </section>
+
+        <!-- SCREEN 17: SCENARIO DETAIL -->
+        <section id="s17" class="app-screen hidden max-w-3xl mx-auto space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                    <div>
+                        <span class="text-xs font-bold text-brand-500 uppercase tracking-wider">Scenario Inspector</span>
+                        <h2 id="detailTitle" class="text-xl font-extrabold text-slate-900">123 Music Row</h2>
+                    </div>
+                    <button onclick="app.navigateTo('s8')" class="px-3.5 py-2 bg-brand-500 text-white rounded-xl text-xs font-bold">
+                        Load into Calculator
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <span class="text-slate-500 block">Purchase Price</span>
+                        <span id="detailPrice" class="font-bold text-sm text-slate-900">$330,000</span>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                        <span class="text-slate-500 block">Loan Type</span>
+                        <span id="detailLoanType" class="font-bold text-sm text-slate-900">Conventional 30-Yr</span>
+                    </div>
+                    <div class="bg-emerald-50 p-3 rounded-xl border border-emerald-200">
+                        <span class="text-emerald-700 block">Monthly Payment</span>
+                        <span id="detailPayment" class="font-extrabold text-sm text-emerald-800">$2,418 / mo</span>
+                    </div>
+                    <div class="bg-amber-50 p-3 rounded-xl border border-amber-200">
+                        <span class="text-amber-700 block">Cash To Close</span>
+                        <span id="detailCash" class="font-extrabold text-sm text-amber-800">$24,850</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 18: PROFILE / REALTOR BRANDING -->
+        <section id="s18" class="app-screen hidden max-w-3xl mx-auto space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div class="flex items-center gap-4 border-b border-slate-100 pb-6">
+                    <div class="w-20 h-20 bg-brand-500 text-white rounded-2xl flex items-center justify-center font-extrabold text-2xl shadow-md border-2 border-brand-accent">
+                        TR
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-extrabold text-slate-900">Tracie Robinson</h2>
+                        <p class="text-xs font-bold text-brand-500">REALTOR® / Affiliate Broker</p>
+                        <p class="text-xs text-slate-600">Benchmark Realty, LLC — Nashville, TN</p>
+                        <span class="inline-block mt-2 bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full">
+                            <i class="fa-solid fa-circle-check"></i> PRO Agent License Active
+                        </span>
+                    </div>
+                </div>
+
+                <div class="space-y-4 text-xs">
+                    <h3 class="font-bold text-slate-900 text-sm">Professional Profile &amp; Report Branding Defaults</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Phone Number</label>
+                            <input type="text" value="(615) 555-0199" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Email Address</label>
+                            <input type="email" value="tracie@benchmarkrealtytn.example" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">License Identifier</label>
+                            <input type="text" value="TN RE Lic #345920" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Brokerage Office</label>
+                            <input type="text" value="Benchmark Realty - Cool Springs / Nashville" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 19: SETTINGS -->
+        <section id="s19" class="app-screen hidden max-w-3xl mx-auto space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div class="border-b border-slate-100 pb-3">
+                    <h2 class="text-xl font-extrabold text-slate-900">App Settings &amp; Defaults</h2>
+                    <p class="text-xs text-slate-500">Configure financial calculation defaults and disclosures.</p>
+                </div>
+
+                <div class="space-y-4 text-xs">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Default Interest Rate (%)</label>
+                            <input type="number" value="6.50" step="0.125" class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5">
+                        </div>
+                        <div>
+                            <label class="block font-semibold text-slate-700 mb-1">Default Loan Term</label>
+                            <select class="w-full bg-slate-50 border border-slate-300 rounded-xl p-2.5">
+                                <option value="30">30 Years Fixed</option>
+                                <option value="15">15 Years Fixed</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Subscription Tiers Banner -->
+                    <div class="bg-gradient-to-r from-slate-900 to-brand-700 text-white p-5 rounded-2xl space-y-3">
+                        <div class="flex justify-between items-center">
+                            <span class="text-xs font-bold uppercase tracking-wider text-brand-accent">Subscription Tier</span>
+                            <span class="bg-brand-accent text-slate-950 text-[10px] font-extrabold px-2 py-0.5 rounded">PROFESSIONAL PLAN</span>
+                        </div>
+                        <p class="text-xs text-slate-300">Active REALTOR® Professional License for Tracie Robinson | Benchmark Realty, LLC.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCREEN 20: HELP & DEFINITIONS TERMINOLOGY DICTIONARY -->
+        <section id="s20" class="app-screen hidden max-w-3xl mx-auto space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+                <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-extrabold text-slate-900">Real Estate Financial Glossary</h2>
+                        <p class="text-xs text-slate-500">Plain English terminology guide for buyers &amp; agents.</p>
+                    </div>
+                    <input type="text" id="dictSearch" placeholder="Search terms..." oninput="app.filterDictionary()" class="bg-slate-50 border border-slate-300 rounded-xl p-2 text-xs w-40">
+                </div>
+
+                <div id="dictionaryGrid" class="space-y-3 text-xs">
+                    <!-- Dynamic rendering -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- MOBILE BOTTOM NAVIGATION BAR -->
+    <nav class="no-print fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/80 px-2 py-1.5 shadow-lg">
+        <div class="max-w-md mx-auto flex justify-around items-center">
+            <button onclick="app.navigateTo('s3')" id="navS3" class="nav-btn flex flex-col items-center p-1.5 text-brand-500 font-bold transition">
+                <i class="fa-solid fa-house text-lg"></i>
+                <span class="text-[10px] mt-0.5">Home</span>
+            </button>
+            <button onclick="app.navigateTo('s4')" id="navS4" class="nav-btn flex flex-col items-center p-1.5 text-slate-400 hover:text-slate-700 transition">
+                <i class="fa-solid fa-calculator text-lg"></i>
+                <span class="text-[10px] mt-0.5">Calculator</span>
+            </button>
+            <button onclick="app.navigateTo('s10')" id="navS10" class="nav-btn flex flex-col items-center p-1.5 text-slate-400 hover:text-slate-700 transition">
+                <i class="fa-solid fa-code-compare text-lg"></i>
+                <span class="text-[10px] mt-0.5">Offers</span>
+            </button>
+            <button onclick="app.navigateTo('s14')" id="navS14" class="nav-btn flex flex-col items-center p-1.5 text-slate-400 hover:text-slate-700 transition">
+                <i class="fa-solid fa-chess-knight text-lg"></i>
+                <span class="text-[10px] mt-0.5">Scenarios</span>
+            </button>
+            <button onclick="app.navigateTo('s18')" id="navS18" class="nav-btn flex flex-col items-center p-1.5 text-slate-400 hover:text-slate-700 transition">
+                <i class="fa-solid fa-user-gear text-lg"></i>
+                <span class="text-[10px] mt-0.5">Profile</span>
+            </button>
+        </div>
+    </nav>
+
+    <script>
+        /**
+         * Home Offer Calculator Application Architecture
+         * Created for Tracie Robinson | Benchmark Realty, LLC
+         */
+        class HomeOfferApp {
+            constructor() {
+                this.currentScreen = 's3';
+                this.history = [];
+                this.currentOnboardSlide = 1;
+
+                // State Data Model
+                this.state = {
+                    address: "123 Music Row, Nashville, TN 37203",
+                    purchasePrice: 330000,
+                    propertyTaxAnnual: 2850,
+                    homeInsuranceAnnual: 1440,
+                    hoaFeeMonthly: 75,
+                    downPaymentAmt: 16500,
+                    downPaymentPct: 5.0,
+                    creditScore: "700-739",
+                    targetPayment: 2500,
+                    loanType: "Conventional",
+                    interestRate: 6.50,
+                    loanTermYears: 30,
+                    pmiManual: null,
+                    pmiEstimatedMonthly: 130.63,
+                    sellerConcessionAmt: 5000,
+                    sellerConcessionPct: 1.52,
+                    buyerClosingCosts: 6800,
+                    prepaidEscrow: 2850,
+                    earnestMoney: 3300,
+                    buydownOption: "none",
+                    effectiveRate: 6.50,
+                    buydownCost: 0,
+                    // Calculated Outputs
+                    loanAmount: 313500,
+                    piMonthly: 1984.63,
+                    taxMonthly: 237.50,
+                    insMonthly: 120.00,
+                    totalMonthlyPayment: 2418.13,
+                    cashToClose: 24850.00,
+                    totalFundsRequired: 26150.00
+                };
+
+                // Saved Scenarios Store
+                this.savedScenarios = [
+                    {
+                        id: 1,
+                        address: "123 Music Row, Nashville, TN",
+                        date: "Oct 1, 2026",
+                        price: 330000,
+                        monthly: 2418,
+                        cash: 24850,
+                        type: "Offer A - Primary"
+                    },
+                    {
+                        id: 2,
+                        address: "456 Broadway, Nashville, TN",
+                        date: "Sep 28, 2026",
+                        price: 415000,
+                        monthly: 2980,
+                        cash: 31200,
+                        type: "Offer B - Competitive"
+                    }
+                ];
+
+                // Glossary Data
+                this.glossary = [
+                    { term: "Principal & Interest (P&I)", def: "The core monthly loan payment. Principal reduces the loan balance; interest pays the lender." },
+                    { term: "PMI / MIP", def: "Private Mortgage Insurance (Conventional) or Mortgage Insurance Premium (FHA). Required when down payment is less than 20%." },
+                    { term: "Seller Concession", def: "A financial contribution paid by the seller to assist the buyer with closing costs or rate buydowns." },
+                    { term: "Prepaids", def: "Upfront escrow funds collected at closing for upcoming property taxes and homeowners insurance." },
+                    { term: "Cash To Close", def: "The net total dollar amount required from the buyer at settlement (Down Payment + Fees - Credits - Earnest Money)." },
+                    { term: "Rate Buydown", def: "Upfront fee paid at closing to secure a lower interest rate, reducing monthly payments." },
+                    { term: "Earnest Money", def: "Good-faith deposit submitted with purchase offer, credited toward cash to close at settlement." }
+                ];
+
+                this.init();
+            }
+
+            init() {
+                this.calculateLive();
+                this.renderSavedScenarios();
+                this.renderDictionary();
+                this.navigateTo('s3');
+            }
+
+            // Screen Navigation Handler
+            navigateTo(screenId) {
+                if (screenId !== this.currentScreen) {
+                    this.history.push(this.currentScreen);
+                }
+                this.currentScreen = screenId;
+
+                // Hide all screens
+                document.querySelectorAll('.app-screen').forEach(el => el.classList.add('hidden'));
+
+                // Show target screen
+                const target = document.getElementById(screenId);
+                if (target) target.classList.remove('hidden');
+
+                // Update select dropdown
+                const select = document.getElementById('screenJumpSelect');
+                if (select) select.value = screenId;
+
+                // Update Back Button
+                const backBtn = document.getElementById('backBtn');
+                if (backBtn) {
+                    if (this.history.length > 0 && screenId !== 's3') {
+                        backBtn.classList.remove('hidden');
+                    } else {
+                        backBtn.classList.add('hidden');
+                    }
+                }
+
+                // Update screen subtitle
+                const subtitle = document.getElementById('screenSubtitle');
+                const titleMap = {
+                    s1: "Screen 01: Splash Launch",
+                    s2: "Screen 02: Onboarding",
+                    s3: "Screen 03: Dashboard",
+                    s4: "Screen 04: Property & Buyer",
+                    s5: "Screen 05: Loan Specifications",
+                    s6: "Screen 06: Seller & Closing",
+                    s7: "Screen 07: Rate Buydown Input",
+                    s8: "Screen 08: Results Dashboard",
+                    s9: "Screen 09: Max Purchase Price",
+                    s10: "Screen 10: Multi-Offer Matrix",
+                    s11: "Screen 11: Seller Concessions",
+                    s12: "Screen 12: Buydown Matrix",
+                    s13: "Screen 13: Cash To Close Stack",
+                    s14: "Screen 14: Offer Strategy",
+                    s15: "Screen 15: Client Summary Report",
+                    s16: "Screen 16: Saved Scenarios",
+                    s17: "Screen 17: Scenario Inspector",
+                    s18: "Screen 18: REALTOR® Profile",
+                    s19: "Screen 19: App Settings",
+                    s20: "Screen 20: Glossary / Definitions"
+                };
+                if (subtitle && titleMap[screenId]) {
+                    subtitle.innerText = titleMap[screenId];
+                }
+
+                // Update bottom navigation active style
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.classList.remove('text-brand-500', 'font-bold');
+                    btn.classList.add('text-slate-400');
+                });
+                const activeNav = document.getElementById('nav' + screenId.toUpperCase());
+                if (activeNav) {
+                    activeNav.classList.remove('text-slate-400');
+                    activeNav.classList.add('text-brand-500', 'font-bold');
+                }
+
+                window.scrollTo(0, 0);
+            }
+
+            goBack() {
+                if (this.history.length > 0) {
+                    const prev = this.history.pop();
+                    this.navigateTo(prev);
+                } else {
+                    this.navigateTo('s3');
+                }
+            }
+
+            startNewCalculation() {
+                this.navigateTo('s4');
+            }
+
+            // Onboarding Slide Controls
+            setSlide(num) {
+                this.currentOnboardSlide = num;
+                document.querySelectorAll('.onboard-slide').forEach(s => s.classList.add('hidden'));
+                document.getElementById('onboardSlide' + num).classList.remove('hidden');
+
+                // Update dots
+                [1, 2, 3].forEach(i => {
+                    const dot = document.getElementById('dot' + i);
+                    if (i === num) {
+                        dot.className = "w-8 h-2 rounded-full bg-brand-500 transition-all";
+                    } else {
+                        dot.className = "w-2 h-2 rounded-full bg-slate-300 transition-all";
+                    }
+                });
+
+                const prevBtn = document.getElementById('onboardPrev');
+                if (num === 1) {
+                    prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    prevBtn.disabled = true;
+                } else {
+                    prevBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    prevBtn.disabled = false;
+                }
+            }
+
+            nextSlide() {
+                if (this.currentOnboardSlide < 3) {
+                    this.setSlide(this.currentOnboardSlide + 1);
+                } else {
+                    this.navigateTo('s3');
+                }
+            }
+
+            prevSlide() {
+                if (this.currentOnboardSlide > 1) {
+                    this.setSlide(this.currentOnboardSlide - 1);
+                }
+            }
+
+            // Form Sync Helpers
+            syncDownPayment(source) {
+                const price = parseFloat(document.getElementById('purchasePrice').value) || 0;
+                const amtInput = document.getElementById('downPaymentAmount');
+                const pctInput = document.getElementById('downPaymentPercent');
+
+                if (source === 'amount') {
+                    const amt = parseFloat(amtInput.value) || 0;
+                    if (price > 0) {
+                        pctInput.value = ((amt / price) * 100).toFixed(1);
+                    }
+                } else {
+                    const pct = parseFloat(pctInput.value) || 0;
+                    amtInput.value = Math.round((price * pct) / 100);
+                }
+
+                // Error validation
+                const errDown = document.getElementById('errDown');
+                if (parseFloat(amtInput.value) > price) {
+                    errDown.classList.remove('hidden');
+                } else {
+                    errDown.classList.add('hidden');
+                }
+
+                this.calculateLive();
+            }
+
+            syncSellerConcession(source) {
+                const price = parseFloat(document.getElementById('purchasePrice').value) || 0;
+                const amtInput = document.getElementById('sellerConcessionAmt');
+                const pctInput = document.getElementById('sellerConcessionPct');
+
+                if (source === 'amount') {
+                    const amt = parseFloat(amtInput.value) || 0;
+                    if (price > 0) {
+                        pctInput.value = ((amt / price) * 100).toFixed(2);
+                    }
+                } else {
+                    const pct = parseFloat(pctInput.value) || 0;
+                    amtInput.value = Math.round((price * pct) / 100);
+                }
+
+                this.calculateLive();
+            }
+
+            setLoanType(type) {
+                this.state.loanType = type;
+                document.querySelectorAll('.loan-type-btn').forEach(btn => {
+                    btn.className = "loan-type-btn p-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-600 font-medium text-xs text-center transition";
+                });
+
+                const activeMap = {
+                    Conventional: 'loanTypeConv',
+                    FHA: 'loanTypeFHA',
+                    VA: 'loanTypeVA',
+                    USDA: 'loanTypeUSDA'
+                };
+                const activeBtn = document.getElementById(activeMap[type]);
+                if (activeBtn) {
+                    activeBtn.className = "loan-type-btn p-3 rounded-xl border border-brand-500 bg-brand-50 text-brand-700 font-bold text-xs text-center transition";
+                }
+
+                this.calculateLive();
+            }
+
+            selectBuydown(opt) {
+                this.state.buydownOption = opt;
+                document.querySelectorAll('.buydown-card').forEach(c => {
+                    c.className = "buydown-card p-4 rounded-xl border border-slate-200 bg-white hover:border-slate-300 cursor-pointer transition";
+                });
+
+                const baseRate = parseFloat(document.getElementById('interestRate').value) || 6.50;
+                const effInput = document.getElementById('effectiveRate');
+                const costInput = document.getElementById('buydownCost');
+                const loanAmt = this.state.loanAmount;
+
+                if (opt === 'none') {
+                    document.getElementById('bdCardNone').className = "buydown-card p-4 rounded-xl border-2 border-brand-500 bg-brand-50/50 cursor-pointer transition";
+                    effInput.value = baseRate.toFixed(2);
+                    costInput.value = 0;
+                } else if (opt === '1point') {
+                    document.getElementById('bdCard1P').className = "buydown-card p-4 rounded-xl border-2 border-brand-500 bg-brand-50/50 cursor-pointer transition";
+                    effInput.value = (baseRate - 0.25).toFixed(2);
+                    costInput.value = Math.round(loanAmt * 0.01);
+                } else if (opt === '2point') {
+                    document.getElementById('bdCard2P').className = "buydown-card p-4 rounded-xl border-2 border-brand-500 bg-brand-50/50 cursor-pointer transition";
+                    effInput.value = (baseRate - 0.50).toFixed(2);
+                    costInput.value = Math.round(loanAmt * 0.02);
+                } else if (opt === '321') {
+                    document.getElementById('bdCard321').className = "buydown-card p-4 rounded-xl border-2 border-brand-500 bg-brand-50/50 cursor-pointer transition";
+                    effInput.value = (baseRate - 3.00).toFixed(2);
+                    costInput.value = Math.round(loanAmt * 0.045);
+                }
+
+                this.calculateLive();
+            }
+
+            // CORE CALCULATION ENGINE
+            calculateLive() {
+                // Gather inputs
+                const price = parseFloat(document.getElementById('purchasePrice')?.value) || 330000;
+                const taxAnn = parseFloat(document.getElementById('propertyTax')?.value) || 0;
+                const insAnn = parseFloat(document.getElementById('homeInsurance')?.value) || 0;
+                const hoa = parseFloat(document.getElementById('hoaFee')?.value) || 0;
+
+                const downAmt = parseFloat(document.getElementById('downPaymentAmount')?.value) || 0;
+                const downPct = price > 0 ? (downAmt / price) * 100 : 0;
+
+                let rate = parseFloat(document.getElementById('effectiveRate')?.value) || 6.50;
+                const baseRate = parseFloat(document.getElementById('interestRate')?.value) || 6.50;
+                const termYears = parseInt(document.getElementById('loanTermYears')?.value) || 30;
+
+                const sellerConc = parseFloat(document.getElementById('sellerConcessionAmt')?.value) || 0;
+                const buyerClosing = parseFloat(document.getElementById('buyerClosingCosts')?.value) || 0;
+                const prepaids = parseFloat(document.getElementById('prepaidEscrow')?.value) || 0;
+                const earnest = parseFloat(document.getElementById('earnestMoney')?.value) || 0;
+                const buydownFee = parseFloat(document.getElementById('buydownCost')?.value) || 0;
+
+                // Loan calculations
+                const loanAmt = Math.max(0, price - downAmt);
+                this.state.loanAmount = loanAmt;
+
+                // Monthly Principal & Interest Math
+                const r = rate / 100 / 12;
+                const n = termYears * 12;
+                let piMonthly = 0;
+                if (r > 0) {
+                    piMonthly = loanAmt * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
+                } else {
+                    piMonthly = loanAmt / n;
+                }
+
+                const taxMonthly = taxAnn / 12;
+                const insMonthly = insAnn / 12;
+
+                // PMI calculation logic
+                let pmiMonthly = 0;
+                const pmiManualInput = document.getElementById('pmiEstimate')?.value;
+                if (pmiManualInput !== "" && pmiManualInput !== undefined && !isNaN(pmiManualInput)) {
+                    pmiMonthly = parseFloat(pmiManualInput);
+                } else {
+                    // Auto assumption
+                    if (this.state.loanType === 'Conventional' && downPct < 20) {
+                        pmiMonthly = (loanAmt * 0.005) / 12; // 0.5% factor
+                    } else if (this.state.loanType === 'FHA') {
+                        pmiMonthly = (loanAmt * 0.0055) / 12; // 0.55% MIP factor
+                    } else {
+                        pmiMonthly = 0;
+                    }
+                }
+
+                const totalMonthly = piMonthly + taxMonthly + insMonthly + hoa + pmiMonthly;
+
+                // Cash to close calculation stack
+                const totalFundsRequired = downAmt + buyerClosing + prepaids + buydownFee;
+                const cashToClose = Math.max(0, totalFundsRequired - sellerConc - earnest);
+
+                // Update State
+                this.state.purchasePrice = price;
+                this.state.downPaymentAmt = downAmt;
+                this.state.downPaymentPct = downPct;
+                this.state.interestRate = baseRate;
+                this.state.effectiveRate = rate;
+                this.state.piMonthly = piMonthly;
+                this.state.taxMonthly = taxMonthly;
+                this.state.insMonthly = insMonthly;
+                this.state.hoaFeeMonthly = hoa;
+                this.state.pmiEstimatedMonthly = pmiMonthly;
+                this.state.totalMonthlyPayment = totalMonthly;
+                this.state.cashToClose = cashToClose;
+                this.state.totalFundsRequired = totalFundsRequired;
+
+                // UPDATE UI DISPLAYS
+                this.renderCalculatedUI();
+            }
+
+            renderCalculatedUI() {
+                const s = this.state;
+
+                // Formatters
+                const fmtCur = (val) => '$' + Math.round(val).toLocaleString();
+                const fmtCurDec = (val) => '$' + val.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+                // Top Persistent Banner
+                document.getElementById('heroPaymentDisplay').innerHTML = `${fmtCur(s.totalMonthlyPayment)} <span class="text-xs font-normal text-slate-300">/mo</span>`;
+                document.getElementById('heroCashDisplay').innerText = fmtCur(s.cashToClose);
+
+                // Step 3 Live Panel
+                const totalClosing = s.buyerClosingCosts + s.prepaidEscrow;
+                if (document.getElementById('step3TotalClosingDisplay')) {
+                    document.getElementById('step3TotalClosingDisplay').innerText = fmtCur(totalClosing);
+                    document.getElementById('step3SellerCreditDisplay').innerText = '-' + fmtCur(s.sellerConcessionAmt);
+                    document.getElementById('step3EarnestDisplay').innerText = '-' + fmtCur(s.earnestMoney);
+                    document.getElementById('step3NetSettlementDisplay').innerText = fmtCur(Math.max(0, totalClosing - s.sellerConcessionAmt - s.earnestMoney));
+                }
+
+                // Step 4 Buydown Preview Box
+                if (document.getElementById('bdMonthlySavingsDisplay')) {
+                    // Base rate payment
+                    const rBase = s.interestRate / 100 / 12;
+                    const n = s.loanTermYears * 12;
+                    const basePI = s.loanAmount * (rBase * Math.pow(1 + rBase, n)) / (Math.pow(1 + rBase, n) - 1);
+                    const savings = Math.max(0, basePI - s.piMonthly);
+                    document.getElementById('bdMonthlySavingsDisplay').innerText = fmtCurDec(savings);
+                    document.getElementById('bdAnnualSavingsDisplay').innerText = fmtCurDec(savings * 12);
+
+                    if (savings > 0 && s.buydownCost > 0) {
+                        const breakEvenMonths = Math.round(s.buydownCost / savings);
+                        document.getElementById('bdBreakEvenDisplay').innerText = `${breakEvenMonths} Months`;
+                    } else {
+                        document.getElementById('bdBreakEvenDisplay').innerText = "N/A (No buydown)";
+                    }
+                }
+
+                // Main Results Dashboard (Screen 08)
+                if (document.getElementById('resultsMonthlyPayment')) {
+                    document.getElementById('resultsMonthlyPayment').innerText = fmtCur(s.totalMonthlyPayment);
+                    document.getElementById('resultsCashToClose').innerText = fmtCur(s.cashToClose);
+                    document.getElementById('resultsPriceTitle').innerText = fmtCur(s.purchasePrice);
+                    document.getElementById('resultsTotalMonthlyBadge').innerText = `${fmtCurDec(s.totalMonthlyPayment)} / mo`;
+
+                    document.getElementById('breakdownPI').innerText = fmtCurDec(s.piMonthly);
+                    document.getElementById('breakdownTaxes').innerText = fmtCurDec(s.taxMonthly);
+                    document.getElementById('breakdownInsurance').innerText = fmtCurDec(s.insMonthly);
+                    document.getElementById('breakdownHOA').innerText = fmtCurDec(s.hoaFeeMonthly);
+                    document.getElementById('breakdownPMI').innerText = fmtCurDec(s.pmiEstimatedMonthly);
+
+                    // Update segmented bar widths
+                    const tot = s.totalMonthlyPayment;
+                    if (tot > 0) {
+                        document.getElementById('barPI').style.width = `${(s.piMonthly / tot) * 100}%`;
+                        document.getElementById('barTax').style.width = `${(s.taxMonthly / tot) * 100}%`;
+                        document.getElementById('barIns').style.width = `${(s.insMonthly / tot) * 100}%`;
+                        document.getElementById('barHOA').style.width = `${(s.hoaFeeMonthly / tot) * 100}%`;
+                        document.getElementById('barPMI').style.width = `${(s.pmiEstimatedMonthly / tot) * 100}%`;
+                    }
+
+                    document.getElementById('sumPrice').innerText = fmtCur(s.purchasePrice);
+                    document.getElementById('sumDown').innerText = `${fmtCur(s.downPaymentAmt)} (${s.downPaymentPct.toFixed(1)}%)`;
+                    document.getElementById('sumLoan').innerText = fmtCur(s.loanAmount);
+                    document.getElementById('sumRate').innerText = `${s.effectiveRate.toFixed(2)}%`;
+                    document.getElementById('sumTerm').innerText = `${s.loanTermYears} Years`;
+                    document.getElementById('sumConcessions').innerText = fmtCur(s.sellerConcessionAmt);
+                }
+
+                // Cash To Close Stack (Screen 13)
+                if (document.getElementById('stackDown')) {
+                    document.getElementById('stackDown').innerText = fmtCurDec(s.downPaymentAmt);
+                    document.getElementById('stackClosing').innerText = fmtCurDec(s.buyerClosingCosts);
+                    document.getElementById('stackPrepaids').innerText = fmtCurDec(s.prepaidEscrow);
+                    document.getElementById('stackBuydown').innerText = fmtCurDec(s.buydownCost);
+                    document.getElementById('stackTotalFunds').innerText = fmtCurDec(s.totalFundsRequired);
+                    document.getElementById('stackConcessions').innerText = '-' + fmtCurDec(s.sellerConcessionAmt);
+                    document.getElementById('stackEarnest').innerText = '-' + fmtCurDec(s.earnestMoney);
+                    document.getElementById('stackCashToClose').innerText = fmtCurDec(s.cashToClose);
+                }
+
+                // Report Summary (Screen 15)
+                if (document.getElementById('reportMonthlyDisplay')) {
+                    document.getElementById('reportMonthlyDisplay').innerText = fmtCurDec(s.totalMonthlyPayment);
+                    document.getElementById('reportCashDisplay').innerText = fmtCurDec(s.cashToClose);
+                    document.getElementById('repPrice').innerText = fmtCur(s.purchasePrice);
+                    document.getElementById('repDown').innerText = `${fmtCur(s.downPaymentAmt)} (${s.downPaymentPct.toFixed(1)}%)`;
+                    document.getElementById('repLoan').innerText = fmtCur(s.loanAmount);
+                    document.getElementById('repRate').innerText = `${s.effectiveRate.toFixed(2)}%`;
+                    document.getElementById('repTerm').innerText = `${s.loanTermYears} Years Fixed`;
+                    document.getElementById('repSellerConc').innerText = fmtCur(s.sellerConcessionAmt);
+
+                    document.getElementById('repPI').innerText = fmtCurDec(s.piMonthly);
+                    document.getElementById('repTax').innerText = fmtCurDec(s.taxMonthly);
+                    document.getElementById('repIns').innerText = fmtCurDec(s.insMonthly);
+                    document.getElementById('repHOA').innerText = fmtCurDec(s.hoaFeeMonthly);
+                    document.getElementById('repPMI').innerText = fmtCurDec(s.pmiEstimatedMonthly);
+                    document.getElementById('repTotalMonthly').innerText = fmtCurDec(s.totalMonthlyPayment);
+                }
+            }
+
+            // Reverse Calculator (Screen 09)
+            calculateReverseMax() {
+                const targetPay = parseFloat(document.getElementById('revTargetPayment').value) || 2500;
+                const downPct = parseFloat(document.getElementById('revDownPct').value) || 5;
+                const rate = parseFloat(document.getElementById('revInterestRate').value) || 6.50;
+                const taxIns = parseFloat(document.getElementById('revTaxIns').value) || 360;
+
+                // PI budget = target - non-P&I expenses
+                const piBudget = Math.max(100, targetPay - taxIns);
+
+                const r = rate / 100 / 12;
+                const n = 360; // 30 yr
+                const maxLoan = piBudget * (Math.pow(1 + r, n) - 1) / (r * Math.pow(1 + r, n));
+                const maxPrice = maxLoan / (1 - (downPct / 100));
+
+                document.getElementById('revMaxPriceOutput').innerText = '$' + Math.round(maxPrice).toLocaleString();
+                document.getElementById('revActualPaymentOutput').innerText = '$' + Math.round(targetPay).toLocaleString() + ' / mo';
+            }
+
+            useMaxPriceInCalc() {
+                const maxStr = document.getElementById('revMaxPriceOutput').innerText.replace(/[^0-9]/g, '');
+                const maxVal = parseFloat(maxStr) || 330000;
+                document.getElementById('purchasePrice').value = maxVal;
+                this.syncDownPayment('percent');
+                this.navigateTo('s4');
+            }
+
+            // Offer Comparison Matrix (Screen 10)
+            recalcOffers() {
+                const calcSingle = (priceId, downId, rateId, sellerId, payTargetId, cashTargetId) => {
+                    const price = parseFloat(document.getElementById(priceId).value) || 0;
+                    const down = parseFloat(document.getElementById(downId).value) || 0;
+                    const rate = parseFloat(document.getElementById(rateId).value) || 6.50;
+                    const seller = parseFloat(document.getElementById(sellerId).value) || 0;
+
+                    const loan = Math.max(0, price - down);
+                    const r = rate / 100 / 12;
+                    const n = 360;
+                    const pi = loan > 0 ? loan * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1) : 0;
+                    const totalMonthly = pi + 237.5 + 120 + 75 + (down < price * 0.2 ? (loan * 0.005) / 12 : 0);
+                    const cash = Math.max(0, down + 6800 + 2850 - seller - 3300);
+
+                    document.getElementById(payTargetId).innerText = '$' + Math.round(totalMonthly).toLocaleString();
+                    document.getElementById(cashTargetId).innerText = '$' + Math.round(cash).toLocaleString();
+                };
+
+                calcSingle('offPriceA', 'offDownA', 'offRateA', 'offSellerA', 'offPayA', 'offCashA');
+                calcSingle('offPriceB', 'offDownB', 'offRateB', 'offSellerB', 'offPayB', 'offCashB');
+                calcSingle('offPriceC', 'offDownC', 'offRateC', 'offSellerC', 'offPayC', 'offCashC');
+                calcSingle('offPriceD', 'offDownD', 'offRateD', 'offSellerD', 'offPayD', 'offCashD');
+            }
+
+            resetOffersToDefault() {
+                document.getElementById('offPriceA').value = 330000;
+                document.getElementById('offPriceB').value = 335000;
+                document.getElementById('offPriceC').value = 335000;
+                document.getElementById('offPriceD').value = 325000;
+                this.recalcOffers();
+            }
+
+            // Concession Limits (Screen 11)
+            validateConcessions() {
+                const price = this.state.purchasePrice;
+                const prog = document.getElementById('concProgSelect').value;
+                const req = parseFloat(document.getElementById('concReqAmount').value) || 0;
+
+                let limitPct = 0.03;
+                if (prog === 'Conv6' || prog === 'FHA') limitPct = 0.06;
+                if (prog === 'VA') limitPct = 0.04;
+
+                const maxAllowed = price * limitPct;
+                document.getElementById('concMaxAllowedDisplay').innerText = '$' + Math.round(maxAllowed).toLocaleString();
+
+                const banner = document.getElementById('concWarningBanner');
+                if (req > maxAllowed) {
+                    banner.classList.remove('hidden');
+                    document.getElementById('concWarningText').innerText = `The requested $${req.toLocaleString()} exceeds the maximum allowed ${limitPct * 100}% limit ($${Math.round(maxAllowed).toLocaleString()}) for this program. Verify guidelines with lender.`;
+                } else {
+                    banner.classList.add('hidden');
+                }
+
+                const totalClosing = 6800 + 2850;
+                const netBuyer = Math.max(0, totalClosing - Math.min(req, maxAllowed));
+                document.getElementById('concNetBuyerCostDisplay').innerText = '$' + Math.round(netBuyer).toLocaleString();
+            }
+
+            // Saved Scenarios Handling
+            saveCurrentScenario() {
+                const newScen = {
+                    id: Date.now(),
+                    address: this.state.address,
+                    date: "Oct 1, 2026",
+                    price: this.state.purchasePrice,
+                    monthly: Math.round(this.state.totalMonthlyPayment),
+                    cash: Math.round(this.state.cashToClose),
+                    type: "Active Scenario"
+                };
+                this.savedScenarios.unshift(newScen);
+                this.renderSavedScenarios();
+                alert('Scenario saved successfully to local portfolio!');
+            }
+
+            renderSavedScenarios() {
+                const countSpan = document.getElementById('savedCount');
+                if (countSpan) countSpan.innerText = this.savedScenarios.length;
+
+                const homeGrid = document.getElementById('homeRecentScenariosGrid');
+                const fullGrid = document.getElementById('savedScenariosFullList');
+
+                const renderCardHtml = (scen) => `
+                    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3 hover:border-brand-500 transition">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-brand-500 bg-brand-50 px-2 py-0.5 rounded">${scen.type}</span>
+                                <h4 class="font-bold text-slate-900 text-sm mt-1">${scen.address}</h4>
+                                <p class="text-[11px] text-slate-400">Saved on ${scen.date}</p>
+                            </div>
+                            <span class="font-extrabold text-sm text-slate-900">$${scen.price.toLocaleString()}</span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 text-xs pt-2 border-t border-slate-100">
+                            <div>
+                                <span class="text-slate-400 block text-[10px]">EST. PAYMENT</span>
+                                <span class="font-bold text-emerald-600">$${scen.monthly.toLocaleString()} / mo</span>
+                            </div>
+                            <div>
+                                <span class="text-slate-400 block text-[10px]">CASH TO CLOSE</span>
+                                <span class="font-bold text-amber-600">$${scen.cash.toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-2 pt-1">
+                            <button onclick="app.loadSavedScenario(${scen.id})" class="w-full py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-lg transition">Open</button>
+                            <button onclick="app.deleteScenario(${scen.id})" class="px-2 py-1.5 text-slate-400 hover:text-red-500 transition"><i class="fa-regular fa-trash-can"></i></button>
+                        </div>
+                    </div>
+                `;
+
+                if (homeGrid) {
+                    homeGrid.innerHTML = this.savedScenarios.slice(0, 2).map(renderCardHtml).join('');
+                }
+                if (fullGrid) {
+                    fullGrid.innerHTML = this.savedScenarios.map(renderCardHtml).join('');
+                }
+            }
+
+            loadSavedScenario(id) {
+                const item = this.savedScenarios.find(s => s.id === id);
+                if (item) {
+                    document.getElementById('detailTitle').innerText = item.address;
+                    document.getElementById('detailPrice').innerText = '$' + item.price.toLocaleString();
+                    document.getElementById('detailPayment').innerText = '$' + item.monthly.toLocaleString() + ' / mo';
+                    document.getElementById('detailCash').innerText = '$' + item.cash.toLocaleString();
+                    this.navigateTo('s17');
+                }
+            }
+
+            deleteScenario(id) {
+                this.savedScenarios = this.savedScenarios.filter(s => s.id !== id);
+                this.renderSavedScenarios();
+            }
+
+            filterScenarios() {
+                const q = document.getElementById('scenarioSearch').value.toLowerCase();
+                const cards = document.querySelectorAll('#savedScenariosFullList > div');
+                cards.forEach(card => {
+                    const text = card.innerText.toLowerCase();
+                    if (text.includes(q)) card.classList.remove('hidden');
+                    else card.classList.add('hidden');
+                });
+            }
+
+            // Glossary Rendering & Filter
+            renderDictionary() {
+                const grid = document.getElementById('dictionaryGrid');
+                if (!grid) return;
+
+                grid.innerHTML = this.glossary.map(g => `
+                    <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+                        <h4 class="font-bold text-slate-900 text-xs mb-1">${g.term}</h4>
+                        <p class="text-slate-600 text-[11px] leading-relaxed">${g.def}</p>
+                    </div>
+                `).join('');
+            }
+
+            filterDictionary() {
+                const q = document.getElementById('dictSearch').value.toLowerCase();
+                const items = document.querySelectorAll('#dictionaryGrid > div');
+                items.forEach(item => {
+                    if (item.innerText.toLowerCase().includes(q)) item.classList.remove('hidden');
+                    else item.classList.add('hidden');
+                });
+            }
+
+            copySummaryText() {
+                const text = `HOME OFFER SUMMARY\nProperty: ${this.state.address}\nPurchase Price: $${this.state.purchasePrice.toLocaleString()}\nEst Monthly Payment: $${Math.round(this.state.totalMonthlyPayment).toLocaleString()}/mo\nEst Cash To Close: $${Math.round(this.state.cashToClose).toLocaleString()}\nPrepared with Tracie Robinson | Benchmark Realty, LLC`;
+                
+                const tempTx = document.createElement('textarea');
+                tempTx.value = text;
+                document.body.appendChild(tempTx);
+                tempTx.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempTx);
+
+                alert('Summary text copied to clipboard!');
+            }
+        }
+
+        // Initialize application on DOM load
+        let app;
+        window.addEventListener('DOMContentLoaded', () => {
+            app = new HomeOfferApp();
+        });
+    </script>
+</body>
+</html>
